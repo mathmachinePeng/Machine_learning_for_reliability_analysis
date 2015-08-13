@@ -4,14 +4,15 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import csv
 import RFclass
-import Preprocessdata
-import Preprocessdata1 as p
+import Preprocessdata 
+#import Preprocessdata1 as p
 import MySVM as mysvc
 
 # process data into scaled training and testing
 
 df =pd.read_csv(r'D:\Project\python\400\new160half.csv', header=0)
 #data=standardprocess()
+p= Preprocessdata.standardprocess()
 train, trainlabel, test, testlabel = p.scaledivd(df, 0.7)
 #aa, bb, cc, dd = data.normalscale(df, 0.7)
 
