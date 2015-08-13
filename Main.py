@@ -43,7 +43,7 @@ train, trainlabel, test, testlabel = p.scaledivd(df, 0.7)
  
 # # Train with SVM
 svcc=mysvc.training()
-best, scores=svcc.svmlinear(train, trainlabel, -10, 10,100)
+best, scores=svcc.svmlinear(train, trainlabel, -10, 10,20)
 # 
 # # Test with SVM
 svtt=mysvc.test()
