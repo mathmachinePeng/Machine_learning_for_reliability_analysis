@@ -13,18 +13,18 @@ import MySVM as mysvc
 df =pd.read_csv(r'D:\Project\python\400\new160half.csv', header=0)
 #data=standardprocess()
 p= Preprocessdata.standardprocess()
-train, trainlabel, test, testlabel = p.scaledivd(df, 0.7)
+train, trainlabel, test, testlabel = p.noscale(df, 0.7)
 #aa, bb, cc, dd = data.normalscale(df, 0.7)
 
 
 """ THis is RF"""
 # Train the model by RF
 
-#ff=RFclass.training()
-#forest= ff.trainforest(aa, bb, 500)
+ff=RFclass.training()
+forest= ff.trainforest('ext', train, trainlabel, 1000)
 
-#tt=RFclass.test()
-#LL=tt.testforest(cc, dd, forest)
+tt=RFclass.test()
+LL=tt.testforest(test, testlabel, forest)
 
 #ff.sensitivity(forest, 12)
 
@@ -41,13 +41,15 @@ train, trainlabel, test, testlabel = p.scaledivd(df, 0.7)
 #===============================================================================
  
  
-# # Train with SVM
-svcc=mysvc.training()
-best, scores=svcc.svmlinear(train, trainlabel, -10, 10,20)
-# 
-# # Test with SVM
-svtt=mysvc.test()
-svtt.testsvm(test, testlabel, best)
+#===============================================================================
+# # # Train with SVM
+# svcc=mysvc.training()
+# best, scores=svcc.svmlinear(train, trainlabel, -10, 10,20)
+# # 
+# # # Test with SVM
+# svtt=mysvc.test()
+# svtt.testsvm(test, testlabel, best)
+#===============================================================================
  
  
  

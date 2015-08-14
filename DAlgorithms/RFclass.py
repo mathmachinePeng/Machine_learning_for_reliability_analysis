@@ -3,21 +3,26 @@ import numpy as np
 import pandas as pd
 from sklearn import preprocessing
 import matplotlib.pyplot as plt
-from sklearn.metrics.classification import accuracy_score, confusion_matrix
+from sklearn.metrics.classification import accuracy_score, confusion_matrix, classification_report
 import csv
-from sklearn.ensemble import RandomForestClassifier
+from sklearn.ensemble import RandomForestClassifier, AdaBoostClassifier, BaggingClassifier, ExtraTreesClassifier
 
 
 class training(object):
     def __init__(self):
         print "This is for training set**************************************"
         
-    def trainlinear(self, train, trainlabel, number_trees):
-        rawforest=RandomForestClassifier(n_estimators= number_trees)
+    def trainforest(self, seed, train, trainlabel, number_trees):
+        seedoftree = {'rf': RandomForestClassifier(n_estimators= number_trees), 
+                      'adb': AdaBoostClassifier(n_estimators= number_trees),
+                      'bag': BaggingClassifier(n_estimators= number_trees),
+                      'ext': ExtraTreesClassifier(n_estimators= number_trees)}
+        rawforest=seedoftree[seed]
         forest=rawforest.fit(train,trainlabel)
         outputtrain= forest.predict(train)
         accuracytrain = accuracy_score(trainlabel, outputtrain)        
         print "The size of the training set is %r , %r" %(np.shape(train)[0],np.shape(train)[1]) 
+        print "The method is %r" %seed
         print "The accuracy for the training set is %r" %accuracytrain, "and the confusion matrix is"
         print confusion_matrix(outputtrain,trainlabel)
         return (forest)
@@ -55,6 +60,7 @@ class test():
         print  np.shape(test)
         print "The accuracy for the test set is %r" %accuracytrain, "and the confusion matrix is"
         print confusion_matrix(outputtest,testlabel)
+        print classification_report(testlabel, outputtest)
         # generate probability
         outputproba=forest.predict_proba(test)       
         outperfor={'prob0':outputproba[:,0],'prob1':outputproba[:,1],'output':outputtest,'target':testlabel}
