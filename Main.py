@@ -10,7 +10,7 @@ import MySVM as mysvc
 
 # process data into scaled training and testing
 
-df =pd.read_csv(r'D:\Project\python\400\new160half.csv', header=0)
+df =pd.read_csv('/home/peng/new160half.csv', header=0)
 #data=standardprocess()
 p= Preprocessdata.standardprocess()
 train, trainlabel, test, testlabel = p.noscale(df, 0.7)
