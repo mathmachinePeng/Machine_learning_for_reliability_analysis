@@ -247,7 +247,7 @@ def load_data(dataset):
             (test_set_x, test_set_y)]
     return rval
 
-def JP_sgd_optimization_mnist(learning_rate=0.13, n_epochs=1000,
+def free_sgd_optimization_mnist(learning_rate, n_epochs,
                            train, trainlabel, valid, validlabel, test, testlabel,
                            batch_size=5):
     """
@@ -270,19 +270,30 @@ def JP_sgd_optimization_mnist(learning_rate=0.13, n_epochs=1000,
     """
 #    datasets = load_data(dataset)
 
-    train_set_x = train 
-    train_set_y = trainlabel
-    valid_set_x = valid 
-    valid_set_y = validlabel
-    test_set_x = test
-    test_set_y = testlabel
-    # compute number of minibatches for training, validation and testing
-    # n_train_batches = train_set_x.get_value(borrow=True).shape[0] / batch_size
-    # n_valid_batches = valid_set_x.get_value(borrow=True).shape[0] / batch_size
-    #-- n_test_batches = test_set_x.get_value(borrow=True).shape[0] / batch_size
-    n_train_batches = train_set_x.shape[0] / batch_size
-    n_valid_batches = valid_set_x.shape[0] / batch_size
-    n_test_batches = test_set_x.shape[0] / batch_size
+
+
+    #------------------------------------------------------- train_set_x = train
+    #-------------------------------------------------- train_set_y = trainlabel
+    #------------------------------------------------------- valid_set_x = valid
+    #-------------------------------------------------- valid_set_y = validlabel
+    #--------------------------------------------------------- test_set_x = test
+    #---------------------------------------------------- test_set_y = testlabel
+    
+    ###################################dangerous
+    train_set_x = theano.shared(numpy.array(train, dtype='float64'))
+    train_set_y = theano.shared(numpy.array(trainlabel, dtype='int32'))
+    valid_set_x = theano.shared(numpy.array(valid, dtype='float64'))
+    valid_set_y = theano.shared(numpy.array(validlabel, dtype='int32'))    
+    test_set_x = theano.shared(numpy.array(test, dtype='float64'))
+    test_set_y = theano.shared(numpy.array(testlabel, dtype='int32'))    
+    
+    
+    ###################################
+    #compute number of minibatches for training, validation and testing
+    n_train_batches = train_set_x.get_value(borrow=True).shape[0] / batch_size
+    n_valid_batches = valid_set_x.get_value(borrow=True).shape[0] / batch_size
+    n_test_batches = test_set_x.get_value(borrow=True).shape[0] / batch_size
+
     ######################
     # BUILD ACTUAL MODEL #
     ######################
@@ -298,7 +309,7 @@ def JP_sgd_optimization_mnist(learning_rate=0.13, n_epochs=1000,
 
     # construct the logistic regression class
     # Each MNIST image has size 28*28
-    classifier = LogisticRegression(input=x, n_in=28 * 28, n_out=10)
+    classifier = LogisticRegression(input=x, n_in=12, n_out=2)
 
     # the cost we minimize during training is the negative log likelihood of
     # the model in symbolic format
@@ -467,6 +478,8 @@ def sgd_optimization_mnist(learning_rate=0.13, n_epochs=1000,
 
     """
     datasets = load_data(dataset)
+    print "now we are going to print datasets"
+    print datasets
 
     train_set_x, train_set_y = datasets[0]
     valid_set_x, valid_set_y = datasets[1]
@@ -638,7 +651,7 @@ def sgd_optimization_mnist(learning_rate=0.13, n_epochs=1000,
                           ' ran for %.1fs' % ((end_time - start_time)))
 
 
-def predict():
+def predict(test):
     """
     An example of how to load a trained model and use it
     to predict labels.
@@ -653,16 +666,16 @@ def predict():
         outputs=classifier.y_pred)
 
     # We can test it on some examples from test test
-    dataset='mnist.pkl.gz'
-    datasets = load_data(dataset)
-    test_set_x, test_set_y = datasets[2]
-    test_set_x = test_set_x.get_value()
+    #---------------------------------------------------- dataset='mnist.pkl.gz'
+    #--------------------------------------------- datasets = load_data(dataset)
+    #-------------------------------------- test_set_x, test_set_y = datasets[2]
+    #--------------------------------------- test_set_x = test_set_x.get_value()
 
-    predicted_values = predict_model(test_set_x[:10])
-    print ("Predicted values for the first 10 examples in test set:")
-    print predicted_values
+    predicted_values = predict_model(test)
+    print ("Predicted values for test set:")
+    return predicted_values
 
 
 #---------------------------------------------------- if __name__ == '__main__':
     #-------------------------------------------------- sgd_optimization_mnist()
-
+    
