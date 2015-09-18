@@ -7,24 +7,44 @@ import RFclass
 import Preprocessdata 
 #import Preprocessdata1 as p
 import MySVM as mysvc
+import TAlogistic as tl
+import cPickle, theano
+from sklearn.metrics.classification import accuracy_score, confusion_matrix, classification_report
 
 # process data into scaled training and testing
 
 df =pd.read_csv('/home/peng/new160half.csv', header=0)
 #data=standardprocess()
 p= Preprocessdata.standardprocess()
-train, trainlabel, test, testlabel = p.noscale(df, 0.7)
-#aa, bb, cc, dd = data.normalscale(df, 0.7)
+
+train, trainlabel, test, testlabel = p.scaledivd(df, 0.7)
+len = len(train)
+valid = train[80:len, :]
+validlabel = trainlabel[80:len]
+train=train[0:80,:]
+trainlabel = trainlabel[0:80]
+#------------------------------------------- trainlabel=[trainlabel, trainlabel]
+#----------------------------------------- trainlabel = np.transpose(trainlabel)
+
+
+tl.free_sgd_optimization_mnist(learning_rate=0.1, n_epochs =1001,
+                              train =train, trainlabel= trainlabel,
+                              valid = valid, validlabel = validlabel,
+                                test = test, testlabel = testlabel, batch_size=3)
+################Test the theano model
+outputtest=tl.predict(test)
+print classification_report(testlabel, outputtest)
+print confusion_matrix(testlabel, outputtest)
 
 
 """ THis is RF"""
 # Train the model by RF
 
-ff=RFclass.training()
-forest= ff.trainforest('ext', train, trainlabel, 1000)
-
-tt=RFclass.test()
-LL=tt.testforest(test, testlabel, forest)
+#--------------------------------------------------------- ff=RFclass.training()
+#------------------------ forest= ff.trainforest('ext', train, trainlabel, 1000)
+#------------------------------------------------------------------------------ 
+#------------------------------------------------------------- tt=RFclass.test()
+#------------------------------------- LL=tt.testforest(test, testlabel, forest)
 
 #ff.sensitivity(forest, 12)
 

@@ -49,3 +49,4 @@ class standardprocess():
         Test=X[new_rows:rows,0:new_dimens]
         Testlabel=X[new_rows:rows,new_dimens]        
         return(Train, Trainlabel, Test, Testlabel)
+    
