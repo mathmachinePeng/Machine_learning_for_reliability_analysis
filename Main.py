@@ -29,7 +29,7 @@ dataset=[(train, trainlabel), (valid, validlabel), (test, testlabel)]
 
 
 
-outputtest = mlp.test_mlp(learning_rate=0.0000001,L2_reg=0.001, n_hidden=50, batch_size=3,dataset=dataset)
+outputtest = mlp.test_mlp(learning_rate=0.0000001,L2_reg=0.001, n_hidden=20, batch_size=3,dataset=dataset)
 
 print "this is the final"
 print outputtest
