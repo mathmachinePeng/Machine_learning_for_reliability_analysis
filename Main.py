@@ -10,7 +10,7 @@ import MySVM as mysvc
 import TAlogistic as tl
 import cPickle, theano
 from sklearn.metrics.classification import accuracy_score, confusion_matrix, classification_report
-
+import TAmlp as mlp
 # process data into scaled training and testing
 
 df =pd.read_csv('/home/peng/new160half.csv', header=0)
@@ -25,17 +25,35 @@ train=train[0:80,:]
 trainlabel = trainlabel[0:80]
 #------------------------------------------- trainlabel=[trainlabel, trainlabel]
 #----------------------------------------- trainlabel = np.transpose(trainlabel)
+dataset=[(train, trainlabel), (valid, validlabel), (test, testlabel)]
 
 
-tl.free_sgd_optimization_mnist(learning_rate=0.1, n_epochs =1001,
-                              train =train, trainlabel= trainlabel,
-                              valid = valid, validlabel = validlabel,
-                                test = test, testlabel = testlabel, batch_size=3)
-################Test the theano model
-outputtest=tl.predict(test)
-print classification_report(testlabel, outputtest)
-print confusion_matrix(testlabel, outputtest)
 
+outputtest = mlp.test_mlp(learning_rate=0.0000001,L2_reg=0.001, n_hidden=50, batch_size=3,dataset=dataset)
+
+print "this is the final"
+print outputtest
+
+print accuracy_score(testlabel, outputtest)
+#----------------------------------- print accuracy_score(testlabel, outputtest)
+#mlp.predict(test)
+
+# best result  Best validation score of 23.333333 % obtained at iteration 20, with test performance 18.750000 %
+# mlp(learning_rate=0.0000001,L2_reg=0.1, n_hidden=10, batch_size=3,dataset=dataset)
+
+"""This is SGD Logistic regression"""
+#----------- tl.free_sgd_optimization_mnist(learning_rate=0.001, n_epochs =1001,
+                               #----------------- dataset=dataset, batch_size=3)
+                               
+
+
+
+
+##############Test the theano model
+#-------------------------------------------------- outputtest=mlp.predict(test)
+#---------------------------- print classification_report(testlabel, outputtest)
+#--------------------------------- print confusion_matrix(testlabel, outputtest)
+#----------------------------------- print accuracy_score(testlabel, outputtest)
 
 """ THis is RF"""
 # Train the model by RF
@@ -60,7 +78,7 @@ print confusion_matrix(testlabel, outputtest)
 # svtt.testsvm(test, testlabel, best)
 #===============================================================================
  
- 
+"""This is SVM"""
 #===============================================================================
 # # # Train with SVM
 # svcc=mysvc.training()
