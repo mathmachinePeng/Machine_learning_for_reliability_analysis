@@ -11,6 +11,11 @@ import TAlogistic as tl
 import cPickle, theano
 from sklearn.metrics.classification import accuracy_score, confusion_matrix, classification_report
 import TAmlp as mlp
+
+
+import TAdbn as dbn
+import TAsda as sda
+
 # process data into scaled training and testing
 
 df =pd.read_csv('/home/peng/new160half.csv', header=0)
@@ -28,13 +33,39 @@ trainlabel = trainlabel[0:80]
 dataset=[(train, trainlabel), (valid, validlabel), (test, testlabel)]
 
 
-
 outputtest = mlp.test_mlp(learning_rate=0.0000001,L2_reg=0.001, n_hidden=20, batch_size=3,dataset=dataset)
 
 print "this is the final"
 print outputtest
 
 print accuracy_score(testlabel, outputtest)
+
+dbn.test_DBN(pretraining_epochs= 100,training_epochs=1000, pretrain_lr=0.0001, finetune_lr= 0.15,dataset=dataset, batch_size=3)
+
+
+#sda.test_SdA(dataset= dataset, training_epochs=1000, batch_size=10)
+
+
+# patience matters change from 10 to 10*batch size, and test score from 0.5 to 0.75, the 
+#best patience is from 129, hidden layer size = [10, 10], corrupt level = [.1,.2 ], 0.81
+
+ 
+
+
+
+
+
+
+"""This mlp"""
+#===============================================================================
+# outputtest = mlp.test_mlp(learning_rate=0.0000001,L2_reg=0.001, n_hidden=50, batch_size=3,dataset=dataset)
+# 
+# print "this is the final"
+# print outputtest
+# 
+# print accuracy_score(testlabel, outputtest)
+#===============================================================================
+
 #----------------------------------- print accuracy_score(testlabel, outputtest)
 #mlp.predict(test)
 

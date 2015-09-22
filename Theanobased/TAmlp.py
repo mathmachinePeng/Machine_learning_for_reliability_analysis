@@ -390,7 +390,11 @@ def test_mlp(learning_rate=0.01, L1_reg=0.00, L2_reg=0.0001, n_epochs=1000,
                           (epoch, minibatch_index + 1, n_train_batches,
                            test_score * 100.))
                     
+<<<<<<< HEAD
                     print (predict())
+=======
+                    #print (predict())
+>>>>>>> refs/heads/Local
                     predict_value = predict()
                     
      
