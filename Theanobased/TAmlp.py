@@ -322,11 +322,12 @@ def test_mlp(learning_rate=0.01, L1_reg=0.00, L2_reg=0.0001, n_epochs=1000,
     print '... training'
 
     # early-stopping parameters
-    patience = 10  # look as this many examples regardless
+    patience = 20  # look as this many examples regardless
     patience_increase = 2  # wait this much longer when a new best is
                            # found
     improvement_threshold = 0.995  # a relative improvement of this much is
                                    # considered significant
+#    validation_frequency = n_train_batches
     validation_frequency = min(n_train_batches, patience / 2)
                                   # go through this many
                                   # minibatche before checking the network
@@ -390,11 +391,10 @@ def test_mlp(learning_rate=0.01, L1_reg=0.00, L2_reg=0.0001, n_epochs=1000,
                           (epoch, minibatch_index + 1, n_train_batches,
                            test_score * 100.))
                     
-<<<<<<< HEAD
                     print (predict())
-=======
+
                     #print (predict())
->>>>>>> refs/heads/Local
+
                     predict_value = predict()
                     
      

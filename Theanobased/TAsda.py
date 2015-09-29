@@ -66,7 +66,7 @@ class SdA(object):
         numpy_rng,
         theano_rng=None,
         n_ins=12,
-        hidden_layers_sizes=[50, 50],
+        hidden_layers_sizes=[8, 8],
         n_outs=10,
         corruption_levels=[0.1, 0.1]
     ):
@@ -330,7 +330,7 @@ class SdA(object):
 
 def test_SdA(finetune_lr=0.1, pretraining_epochs=15,
              pretrain_lr=0.001, training_epochs=1000,
-             dataset=[1,2,3], batch_size=1):
+             dataset=[1,2,3], batch_size=1, hidden_params=[8, 8]):
     """
     Demonstrates how to train and test a stochastic denoising autoencoder.
 
@@ -372,7 +372,7 @@ def test_SdA(finetune_lr=0.1, pretraining_epochs=15,
     sda = SdA(
         numpy_rng=numpy_rng,
         n_ins=12,
-        hidden_layers_sizes=[10, 10],
+        hidden_layers_sizes=hidden_params,
  #       hidden_layers_sizes=[10, 10, 10],
         n_outs=2
     )

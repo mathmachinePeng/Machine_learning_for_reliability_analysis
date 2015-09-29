@@ -79,7 +79,7 @@ class dA(object):
         theano_rng=None,
         input=None,
         n_visible=12,
-        n_hidden=50,
+        n_hidden=8,
         W=None,
         bhid=None,
         bvis=None
