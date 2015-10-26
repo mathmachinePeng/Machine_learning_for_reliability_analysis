@@ -1,47 +1,40 @@
-from nose.tools import assert_raises
-from numpy.testing import assert_array_equal, assert_array_almost_equal
+from numpy import *
 
-import numpy as np
+parameter_list = [[100, 2, 5,1.,1000,1,1], [100, 2, 5,1.,1000,1,2]]
 
-from seqlearn.hmm import MultinomialHMM
+def classifier_averaged_perceptron_modular (n=100, dim=2, distance=5,learn_rate=1.,max_iter=1000,num_threads=1,seed=1):
+    from modshogun import RealFeatures, BinaryLabels
+    from modshogun import AveragedPerceptron
+    
+    random.seed(seed)
 
+    # produce some (probably) linearly separable training data by hand
+    # Two Gaussians at a far enough distance
+    X=array(random.randn(dim,n))+distance
+    Y=array(random.randn(dim,n))-distance
+    X_test=array(random.randn(dim,n))+distance
+    Y_test=array(random.randn(dim,n))-distance
+    label_train_twoclass=hstack((ones(n), -ones(n)))
+    
+    #plot(X[0,:], X[1,:], 'x', Y[0,:], Y[1,:], 'o')
+    fm_train_real=hstack((X,Y))
+    fm_test_real=hstack((X_test,Y_test))
 
-text = [w.split() for w in ["this DT",
-                            "is V",
-                            "a DT",
-                            "test N",
-                            "for IN",
-                            "a DT",
-                            "hidden Adj",
-                            "Markov N",
-                            "model N"]]
-words, y = zip(*text)
-lengths = [len(text)]
+    feats_train=RealFeatures(fm_train_real)
+    feats_test=RealFeatures(fm_test_real)
 
-vocab, identities = np.unique(words, return_inverse=True)
-X = (identities.reshape(-1, 1) == np.arange(len(vocab))).astype(int)
+    labels=BinaryLabels(label_train_twoclass)
 
+    perceptron=AveragedPerceptron(feats_train, labels)
+    perceptron.set_learn_rate(learn_rate)
+    perceptron.set_max_iter(max_iter)
+    # only guaranteed to converge for separable data
+    perceptron.train()
 
-def test_hmm():
-    n_features = X.shape[1]
+    perceptron.set_features(feats_test)
+    out_labels = perceptron.apply().get_labels()
+    return perceptron, out_labels
 
-    clf = MultinomialHMM()
-    clf.fit(X, y, lengths)
-    assert_array_equal(clf.classes_, ["Adj", "DT", "IN", "N", "V"])
-    assert_array_equal(clf.predict(X), y)
-
-    clf.set_params(decode="bestfirst")
-    assert_array_equal(clf.predict(X), y)
-
-    n_classes = len(clf.classes_)
-    assert_array_almost_equal(np.ones(n_features),
-                              np.exp(clf.coef_).sum(axis=0))
-    assert_array_almost_equal(np.ones(n_classes),
-                              np.exp(clf.intercept_trans_).sum(axis=0))
-    assert_array_almost_equal(1., np.exp(clf.intercept_final_).sum())
-    assert_array_almost_equal(1., np.exp(clf.intercept_init_).sum())
-
-
-def test_hmm_validation():
-    assert_raises(ValueError, MultinomialHMM(alpha=0).fit, X, y, lengths)
-    assert_raises(ValueError, MultinomialHMM(alpha=-1).fit, X, y, lengths)
+if __name__=='__main__':
+    print('AveragedPerceptron')
+    classifier_averaged_perceptron_modular(*parameter_list[0])

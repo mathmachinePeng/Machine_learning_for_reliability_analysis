@@ -79,6 +79,53 @@ class training(object):
                     
             return (bestmodel, grid.best_score_)
     
+    def svmsigmoid(self, train, trainlabel, Cmin, Cmax, num, base=2, plot=False): #default crossvalidation 10-fold
+        C_range=np.logspace(Cmin, Cmax, num=num, base=base)
+        gamma_range=np.logspace(Cmin, Cmax, num=num, base=base)
+        
+        cv = StratifiedShuffleSplit(trainlabel, n_iter=10, test_size=0.1, random_state=0)
+        param_grid = dict(gamma=gamma_range, C=C_range) 
+        grid = GridSearchCV(SVC('sigmoid', coef0=0), param_grid=param_grid, cv=cv)
+        grid.fit(train, trainlabel) 
+        print("The best parameters are %s with a score of %0.2f"
+              % (grid.best_params_, grid.best_score_))  
+        #=======================================================================
+        scores = [x[1] for x in grid.grid_scores_]
+        scores = np.array(scores).reshape(len(C_range), len(gamma_range))        
+        scores = DataFrame(scores)
+        #=======================================================================
+        bestmodel= svm.SVC(kernel='sigmoid', gamma=1/12, coef0= 0,  C= grid.best_params_["C"]).fit(train,trainlabel)
+#        print grid.best_params_
+        if plot== True:
+            class MidpointNormalize(Normalize):
+                def __init__(self, vmin=None, vmax=None, midpoint=None, clip=False):
+                    self.midpoint = midpoint
+                    Normalize.__init__(self, vmin, vmax, clip)
+            
+                def __call__(self, value, clip=None):
+                    x, y = [self.vmin, self.midpoint, self.vmax], [0.4, 0.6, 0.82]
+                    return np.ma.masked_array(np.interp(value, x, y))
+
+            plt.figure(figsize=(8, 6))
+            plt.subplots_adjust(left=.2, right=0.95, bottom=0.15, top=0.95)
+            
+            plt.imshow(scores, interpolation='nearest', cmap=plt.cm.hot,
+                       norm=MidpointNormalize(vmin=0.4, midpoint=0.55))
+            plt.xlabel('gamma')
+            plt.ylabel('C')
+            plt.colorbar()
+            
+            plt.xticks(np.arange(len(gamma_range)), gamma_range)#np.arrange sets the range of ticks
+            plt.yticks(np.arange(len(C_range)), C_range)           
+            plt.show()
+            return (bestmodel, grid.best_score_)
+        
+        else:
+                    
+            return (bestmodel, grid.best_score_)
+
+
+
     
     
     def svmrbf(self, train, trainlabel, Cmin, Cmax, gmin, gmax, num, base=2, plot=False): #default crossvalidation 10-fold
@@ -138,7 +185,7 @@ class test(object):
                
       
     def testsvm(self, test, testlabel,bestmodel):
-        bestmodel=bestmodel
+#        bestmodel=bestmodel
         outputtest = bestmodel.predict(test)
         accuracytest = accuracy_score(testlabel, outputtest)
         print "The accuracy for the test set is %r" %accuracytest, "and the confusion matrix is"
