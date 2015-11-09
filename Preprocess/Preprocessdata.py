@@ -50,3 +50,10 @@ class standardprocess():
         Testlabel=X[new_rows:rows,new_dimens]        
         return(Train, Trainlabel, Test, Testlabel)
     
+    def noaction(self, raw_data): 
+        X=np.array(raw_data)
+        rows,dimens=np.shape(X)
+        Train=X[:,0:dimens-1]
+        Trainlabel=X[:,dimens-1]
+        return Train, Trainlabel
+    

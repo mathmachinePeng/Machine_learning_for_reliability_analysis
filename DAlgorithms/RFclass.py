@@ -9,7 +9,7 @@ Peng Jiang
 from pandas.core.frame import DataFrame
 import numpy as np
 import pandas as pd
-from sklearn import preprocessing
+from sklearn import preprocessing, cross_validation
 import matplotlib.pyplot as plt
 from sklearn.metrics.classification import accuracy_score, confusion_matrix, classification_report
 import csv
@@ -17,7 +17,11 @@ from sklearn.ensemble import RandomForestClassifier, AdaBoostClassifier, Bagging
 from sklearn.ensemble.partial_dependence import plot_partial_dependence
 from sklearn.ensemble.partial_dependence import partial_dependence
 from mpl_toolkits.mplot3d import Axes3D
-
+from sklearn.grid_search import GridSearchCV
+from sklearn import metrics
+from sklearn.metrics import recall_score, precision_score
+from sklearn.metrics.scorer import make_scorer
+import re
 
 class training(object):
     def __init__(self):
@@ -39,6 +43,188 @@ class training(object):
         # print "The accuracy for the training set is %r" %accuracytrain, "and the confusion matrix is"
         #------------------------ print confusion_matrix(outputtrain,trainlabel)
         return (forest)
+    
+    def train_repeat_forest(self, seed, train, trainlabel, test, testlabel, number_trees, number_features, repeat_times):
+        seed_of_tree = {'rf': RandomForestClassifier(n_estimators= number_trees, max_features=number_features), 
+                      'adb': AdaBoostClassifier(n_estimators= number_trees),
+                      'bag': BaggingClassifier(n_estimators= number_trees),
+                      'ext': ExtraTreesClassifier(n_estimators= number_trees, max_features=number_features),
+                      'gbt': GradientBoostingClassifier(n_estimators= number_trees, max_features=number_features),
+                      'bagging': RandomForestClassifier(n_estimators= number_trees, max_features=12)}
+        rawforest=seed_of_tree[seed]
+        score_list=[]
+        for i in np.arange(repeat_times):
+            forest=rawforest.fit(train,trainlabel)
+            outputtest= forest.predict(test) 
+            accuracytrain = accuracy_score(testlabel, outputtest)
+            score_list.append(accuracytrain)
+        score = np.mean(score_list)
+        return score
+            
+    def train_repeat_forest_metrics(self, seed, train, trainlabel, test, testlabel, tree_range, feature_range, repeat_times):
+        datametrics = DataFrame({'tree_range': tree_range})
+        
+        for number_features in feature_range:
+            score1=[]
+            for number_trees in tree_range:
+                
+                seed_of_tree = {'rf': RandomForestClassifier(n_estimators= number_trees, max_features=number_features), 
+                  'adb': AdaBoostClassifier(n_estimators= number_trees),
+                  'bag': BaggingClassifier(n_estimators= number_trees),
+                  'ext': ExtraTreesClassifier(n_estimators= number_trees, max_features=number_features),
+                  'gbt': GradientBoostingClassifier(n_estimators= number_trees, max_features=number_features),
+                  'bagging': RandomForestClassifier()}
+                   
+                rawforest = seed_of_tree[seed]
+                cm = np.zeros(len(np.unique(testlabel)) ** 2)
+                for times in np.arange(repeat_times):
+                    forest=rawforest.fit(train,trainlabel)
+                    out_value = forest.predict(test)
+                    cm += metrics.confusion_matrix(testlabel, out_value).flatten()
+                cm_ava = cm/ repeat_times
+                score1.append(cm_ava)
+                
+                
+                     
+                
+                
+                                
+#                score1.append(training.mean_scores(self, train, trainlabel, rawforest, repeat_times))
+        
+                
+            datametrics[number_features]=score1
+        return datametrics
+               
+        
+        
+
+    
+#        print "The size of the training set is %r , %r" %(np.shape(train)[0],np.shape(train)[1])
+        #---------------------------------------- print "The method is %r" %seed
+        # print "The accuracy for the training set is %r" %accuracytrain, "and the confusion matrix is"
+        #------------------------ print confusion_matrix(outputtrain,trainlabel)
+  
+    
+    
+    #-- def manCV(self, seed, train, trainlabel, tree_range, feature_range, cv):
+        #----------------------- seed_of_tree = {'rf': RandomForestClassifier(),
+                      #---------------------------- 'adb': AdaBoostClassifier(),
+                      #----------------------------- 'bag': BaggingClassifier(),
+                      #-------------------------- 'ext': ExtraTreesClassifier(),
+                      #-------------------- 'gbt': GradientBoostingClassifier(),
+                      #-------------------- 'bagging': RandomForestClassifier()}
+        #---------------------------------------- rawforest = seed_of_tree[seed]
+        #-------------- k_fold = k_fold = cross_validation.KFold(len(train), cv)
+#------------------------------------------------------------------------------ 
+        #---------------------- for k, (train, trainlabel) in enumerate(k_fold):
+            
+    def compute_measures(self, tn, fp, fn, tp):
+        specificity = tn / (tn + fp)
+        sensitivity = tp / (tp + fn)
+        fmeasure = 2 * (specificity * sensitivity) / (specificity + sensitivity)
+        return sensitivity, specificity, fmeasure   
+    
+         
+    def mean_scores(self, X, y, clf, skf):
+
+        cm = np.zeros(len(np.unique(y)) ** 2)
+        for i, (train, test) in enumerate(skf):
+            clf.fit(X[train], y[train])
+            y_pred = clf.predict(X[test])
+            cm += metrics.confusion_matrix(y[test], y_pred).flatten()
+#            print "cm is", cm 
+        cm_ava = cm/ skf.n_folds
+        return np.array(cm_ava)
+#        return training.compute_measures(self,*cm / skf.n_folds)
+            
+
+
+    def trainmanCV(self, seed, train, trainlabel, tree_range, feature_range):
+
+         
+        
+        k_fold = cross_validation.KFold(len(train), n_folds = 10)
+        datametrics = DataFrame({'tree_range': tree_range})
+        
+        for number_features in feature_range:
+            score1=[]
+            for number_trees in tree_range:
+                
+                seed_of_tree = {'rf': RandomForestClassifier(n_estimators= number_trees, max_features=number_features), 
+                  'adb': AdaBoostClassifier(n_estimators= number_trees),
+                  'bag': BaggingClassifier(n_estimators= number_trees),
+                  'ext': ExtraTreesClassifier(n_estimators= number_trees, max_features=number_features),
+                  'gbt': GradientBoostingClassifier(n_estimators= number_trees, max_features=number_features),
+                  'bagging': RandomForestClassifier()}
+                   
+                rawforest = seed_of_tree[seed]
+                                
+                score1.append(training.mean_scores(self, train, trainlabel, rawforest, k_fold))
+        
+                
+            datametrics[number_features]=score1
+        return datametrics
+
+
+
+    
+    
+    
+    def trainCV(self, seed, train, trainlabel, tree_range, feature_range):
+        seed_of_tree = {'rf': RandomForestClassifier(), 
+                      'adb': AdaBoostClassifier(),
+                      'bag': BaggingClassifier(),
+                      'ext': ExtraTreesClassifier(),
+                      'gbt': GradientBoostingClassifier(),
+                      'bagging': RandomForestClassifier()}
+         
+        rawforest = seed_of_tree[seed]
+        param_grid = dict(max_features=feature_range, n_estimators=tree_range)
+        
+        
+        
+
+        grid = GridSearchCV(rawforest, param_grid=param_grid, cv=10, n_jobs=-1)
+        grid.fit(train, trainlabel)
+        print("The best parameters are %s with a score of %0.2f"
+                  % (grid.best_params_, grid.best_score_))
+
+        acc_scores = [x[1] for x in grid.grid_scores_]
+        acc_scores = np.array(acc_scores).reshape(len(tree_range), len(feature_range))
+        scores = DataFrame(acc_scores)
+
+
+        return scores
+    
+    
+
+        
+        
+        
+    
+    
+    
+    def trainonlyfeat(self, seed, train, trainlabel, tree_range, feature_range):
+        seed_of_tree = {'rf': RandomForestClassifier(), 
+                      'adb': AdaBoostClassifier(),
+                      'bag': BaggingClassifier(),
+                      'ext': ExtraTreesClassifier(),
+                      'gbt': GradientBoostingClassifier(),
+                      'bagging': RandomForestClassifier()}
+         
+        rawforest = seed_of_tree[seed]
+        param_grid = dict( n_estimators=tree_range)
+        grid = GridSearchCV(rawforest, param_grid=param_grid, cv=10)
+        grid.fit(train, trainlabel) 
+        print("The best parameters are %s with a score of %0.2f"
+                  % (grid.best_params_, grid.best_score_))     
+        
+        scores = [x[1] for x in grid.grid_scores_]
+#        scores = np.array(scores).reshape(len(feature_range))        
+        scores = DataFrame(scores)
+        return scores
+    
+    
     
     def importance(self, forest, n):
         print "************************this is the output of relative importance**************"
@@ -92,13 +278,45 @@ class training(object):
         plt.subplots_adjust(top=0.9)
         
         plt.show()
+    def str_float(self, x):
+        tn = []
+        fp = []
+        fn = []
+        tp = []
         
+        for j in range(0, len(x)):
+            raw_met = x[j]
+            raw_met1 = np.array(raw_met)
+    
+            raw_met2 = np.str(raw_met1)
+            raw_met3 = raw_met2.split()
+            raw_met4 =np.str(raw_met3)
+    
+            raw_met5 =re.sub(r'[^0-9, .]', '', raw_met4)
+            raw_met6 = re.sub(r'[,]', '', raw_met5)
+    
+            raw_met7= raw_met6.split()
+            tn.append(np.float(raw_met7[0]))
+            fp.append(np.float(raw_met7[1]))
+            fn.append(np.float(raw_met7[2]))
+            tp.append(np.float(raw_met7[3]))
+            
+        return pd.DataFrame({'tn':tn, 'fp':fp, 'fn':fn, 'tp':tp})        
 
 class test():    
     def __init__(self):
         print "*******************************************"
         
-    def testforest(self, test, testlabel,forest):
+    def testforest_score(self, test, testlabel,forest):
+
+          
+        outputtest= forest.predict(test) 
+        accuracytrain = accuracy_score(testlabel, outputtest)
+        
+        return accuracytrain
+        
+    
+    def testforest_confu(self, test, testlabel,forest):
         outputtest= forest.predict(test) 
         accuracytrain = accuracy_score(testlabel, outputtest)
         #----------------------------------- print "The size of the test set is"
@@ -123,7 +341,8 @@ class test():
 
 #        print confusion_matrix(outputtest,testlabel)
         return  accuracytrain
-        
+    
+    
     def plot_confusion_matrix(self, cm):
         norm_conf = []
         for i in cm:
@@ -160,7 +379,7 @@ class test():
                 else:
                     
 
-                    ax.annotate(str(cm[x][y]), xy=(x, y),
+                    ax.annotate(str(cm[y][x]), xy=(x, y),
                             horizontalalignment='center',
                              verticalalignment='center', fontsize=40, color='#00aaff', fontweight='bold')
         
@@ -170,8 +389,8 @@ class test():
     
         plt.xticks(np.arange(2), ['Unfailed','Failed'], fontsize=20)
         plt.yticks(np.arange(2), ['Unfailed','Failed'], fontsize=20, rotation=90)
-        plt.xlabel('True class', fontsize=24)
-        plt.ylabel('Predicted class', fontsize = 24)
+        plt.xlabel('Predicted class', fontsize=24)
+        plt.ylabel('True class', fontsize = 24)
         plt.show()
 
 

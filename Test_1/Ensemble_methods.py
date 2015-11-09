@@ -3,6 +3,7 @@ Created on 29 Sep 2015
 
 @author: peng
 '''
+from IPython.core.pylabtools import figsize
 from pandas.core.frame import DataFrame
 import numpy as np
 import pandas as pd
@@ -11,19 +12,18 @@ import csv
 import RFclass
 import Preprocessdata 
 #import Preprocessdata1 as p
-import MySVM as mysvc
-import TAlogistic as tl
-import cPickle, theano
 from sklearn.metrics.classification import accuracy_score, confusion_matrix, classification_report
-import TAmlp as mlp
-
-
-import TAdbn as dbn
-import TAsda as sda
+from sklearn.grid_search import GridSearchCV
+import matplotlib as mpl
 from scipy.interpolate import spline
 from bcolz.toplevel import arange
 import timeit
-
+from sklearn import metrics
+import seaborn as sns
+from sklearn.metrics import recall_score, precision_score
+from sklearn.metrics.scorer import make_scorer
+from matplotlib.ticker import MultipleLocator, FormatStrFormatter
+from sklearn.ensemble import RandomForestClassifier, AdaBoostClassifier, BaggingClassifier, ExtraTreesClassifier, GradientBoostingClassifier
 # process data into scaled training and testing
 
 
@@ -33,43 +33,309 @@ import timeit
 def main():
     start = timeit.default_timer()
     df =pd.read_csv('/home/peng/new160half.csv', header=0)
-#data=standardprocess()
+ #   df['random_number']=np.random.random(size = 160)
+  #  df_sort = df.sort(columns='random_number')
+#    df_sort.drop(['random_number'], inplace = True, axis = 1)
+#    df_sort.to_csv('new_random_160.csv', header = 0)
+
     p= Preprocessdata.standardprocess()
-#    df_2 = pd.read_csv('/home/peng/git/Machine_learning_for_reliability_analysis//Test_1/score_long_2features_rf.csv', header=0)
-    xx= np.arange(10, 100, 10)
+# #    df_2 = pd.read_csv('/home/peng/git/Machine_learning_for_reliability_analysis//Test_1/score_long_2features_rf.csv', header=0)
+#------------------------------------------------------------------------------ 
+    train, trainlabel, test, testlabel =p.noscale(df,0.666666)
+#    train, trainlabel = p.noaction(df)
+# #    df_2 = pd.read_csv('/home/peng/git/Machine_learning_for_reliability_analysis/score50-500_2.csv', header=0)
     
-    df_2 = pd.DataFrame(xx)
-    train, trainlabel, test, testlabel = p.noscale(df, 0.7)  
-#    df_2 = pd.read_csv('/home/peng/git/Machine_learning_for_reliability_analysis/score50-500_2.csv', header=0)   
+    count = 0
+
+    for i in testlabel:
+        if i==0:
+            count=count+1
+    print count
+        
+
+
+
+
+ #===============================================================================
     ff=RFclass.training()
+    tt = RFclass.test()
+    feature_range=np.arange(12,13,1)
+    tree_range = np.arange(100,4000,20)
+    forest = ff.trainforest('ext', train, trainlabel, 100, 11)
+    y_pred = forest.predict(test)
+    cm = metrics.confusion_matrix(testlabel, y_pred)
+    print cm
+    print cm.flatten()
 
-
-    tt=RFclass.test()    
     
-    seed=["rf", "adb"]
+    tt.plot_confusion_matrix(cm)
+    
+    #------------------------------------- df_66_33 = {'tree_tange': tree_range}
+    #---------------------------------------------- df_all = DataFrame(df_66_33)
 
-    for i in seed:
-        score = []
-        for j in np.arange(10, 100, 10):
-            
-            forest = ff.trainforest(i, train, trainlabel, j, 4)
-            score.append(tt.testforest(test, testlabel, forest))
+ #   scores = ff.trainonlyfeat('bag', train, trainlabel, tree_range, feature_range)
+#    scores.to_csv('bag_100_4000_10times.csv', header=True)
+
+    
+    # data = ff.train_repeat_forest_metrics('bag', train, trainlabel, test, testlabel, tree_range, feature_range, 10)
+    #---------------- data.to_csv('nnnnnn_crazy66_33_100_4000.csv', header=True)
+#------------------------------------------------------------------------------ 
+    # data = ff.train_repeat_forest_metrics('adb', train, trainlabel, test, testlabel, tree_range, feature_range, 10)
+    #------------ data.to_csv('nnnnnnnnnn_crazy66_33_100_4000.csv', header=True)
+    
+    # data = ff.train_repeat_forest_metrics('gbt', train, trainlabel, test, testlabel, tree_range, feature_range, 10)
+    #------------------- data.to_csv('gbt_crazy66_33_100_4000.csv', header=True)
+
    
-#        score = score.set_index([range(0, len(np.arange(10,100,10)))])
-#        print score
-        df_2[i]=score
-            
-    df_2.to_csv('new.csv', header = True)                  
+    #-- data = ff.trainmanCV('rf', train, trainlabel, tree_range, feature_range)
+    #-------------------------- data.to_csv('rf_crazy100_4000.csv', header=True)
+#------------------------------------------------------------------------------ 
+    #- data = ff.trainmanCV('ext', train, trainlabel, tree_range, feature_range)
+    #------------------------- data.to_csv('ext_crazy100_4000.csv', header=True)
+    
+    
+    #- data = ff.trainmanCV('bag', train, trainlabel, tree_range, feature_range)
+    #------------------------ data.to_csv('bag_crazy100_4000n.csv', header=True)
+#------------------------------------------------------------------------------ 
+    #- data = ff.trainmanCV('adb', train, trainlabel, tree_range, feature_range)
+    #------------------------ data.to_csv('adb_crazy100_4000n.csv', header=True)
+    
+    #- data = ff.trainmanCV('gbt', train, trainlabel, tree_range, feature_range)
+    #------------------------ data.to_csv('gbt_crazy100_4000n.csv', header=True)
+
+
+#    scores.to_csv('rf_1_5_1_feature4.csv', header=False)
+    
+#    print scores
+    stop = timeit.default_timer()
+    print "The running takes %r min" %((stop-start)/60)
+
+    
+    
+if __name__ == '__main__':
+    main()    
+    
+
+
+    
+    
+    #-- scores = ff.trainCV('ext', train, trainlabel, tree_range, feature_range)
+    #---------------------- scores.to_csv('ext_100_4000_new.csv', header = True)
+    
+    
+    
+#------------------------------------------------------------------------------ 
+    #- scores1 = ff.trainCV('gbt', train, trainlabel, tree_range, feature_range)
+    #--------------------- scores1.to_csv('gbt_100_4000_new.csv', header = True)
+
+
+
+
+#    scores=ff.trainonlyfeat('adb', train, trainlabel, tree_range, feature_range)
+
+
+    #--------------------------------------------------- for i in feature_range:
+        #---------------------------------------------------- score_feature = []
+        #-------------------------------------------------- for j in tree_range:
+#------------------------------------------------------------------------------ 
+#------------------------------------------------------------------------------ 
+            # score = ff.train_repeat_forest('adb', train, trainlabel, test, testlabel, j, i, 10)
+            #--------------------------------------- score_feature.append(score)
+        #----------------------------------------------- df_all[i]=score_feature
+    #--------------- df_all.to_csv('adb_66_33_10_100_4000times.csv',header=True)
+    
+    
+
+
+    #--------------------------------------------------- for i in feature_range:
+        #---------------------------------------------------- score_feature = []
+        #-------------------------------------------------- for j in tree_range:
+#------------------------------------------------------------------------------ 
+            # score1= ff.train_repeat_forest('adb', train, trainlabel, test, testlabel, j, i, 10)
+            #-------------------------------------- score_feature.append(score1)
+        #----------------------------------------------- df_all[i]=score_feature
+    #--------------- df_all.to_csv('adb_66_33_10_100_4000times.csv',header=True)
+    
+    
+    
+
+
+
+    #--------------------------------------------------- for i in feature_range:
+        #---------------------------------------------------- score_feature = []
+        #-------------------------------------------------- for j in tree_range:
+#------------------------------------------------------------------------------ 
+            # score2 = ff.train_repeat_forest('gbt', train, trainlabel, test, testlabel, j, i, 10)
+            #-------------------------------------- score_feature.append(score2)
+        #----------------------------------------------- df_all[i]=score_feature
+    #-------------- df_all.to_csv('gbt_66_33_10_2000_4000times.csv',header=True)
+    
+    
+    
+    
+    
+    
+    
+    
+    
+# 
+# 
+#     tt=RFclass.test()    
+#     forest= ff.trainforest('rf', train, trainlabel, 500,4)
+#     impor_rf = ff.importance(forest, 12)
+#===============================================================================
+
+
+    
+    #------------------------------------------- feature_range=np.arange(1,12,1)
+    #-------------------------------------- tree_range = np.arange(2000,4010,20)
+    #--- scores = ff.trainCV('rf', train, trainlabel, tree_range, feature_range)
+    #------------------------ scores.to_csv('rf_2000_4000_20.csv', header= True)
+#------------------------------------------------------------------------------ 
+#------------------------------------------------------------------------------ 
+    #- scores1 = ff.trainCV('ext', train, trainlabel, tree_range, feature_range)
+    #---------------------- scores1.to_csv('ext_2000_4000_20.csv', header= True)
+#------------------------------------------------------------------------------ 
+#------------------------------------------------------------------------------ 
+    #- scores2 = ff.trainCV('gbt', train, trainlabel, tree_range, feature_range)
+    #---------------------- scores2.to_csv('gbt_2000_4000_20.csv', header= True)
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+    
+    
+    # df = pd.read_csv('/home/peng/git/Machine_learning_for_reliability_analysis//Test_1/gbt_66_33_10times.csv', header=0)
+#------------------------------------------------------------------------------ 
+    #------------------------------------------------------- print df.describe()
+#------------------------------------------------------------------------------ 
+    #------------------------------------------------------- scores=np.array(df)
+    #---------------------------------------------------- scores=scores[:, 2:].T
+#------------------------------------------------------------- #    print scores
+    #------------------------------------------------------ scores= scores[:,5:]
+    #---------------------------------------------------- print np.shape(scores)
+#------------------------------------------------------------------------------ 
+#--------------------------------------------- #    print np.arange(100,2010,20)
+#------------------------------------------------------------------------------ 
+    #------------------------------------------------------------- figsize(16,8)
+    #----------------------------------------------- fig, ax = plt.subplots(1,1)
+    #----------- cax = ax.imshow(scores, interpolation='none', origin='highest',
+                    #--------------------------- cmap=plt.cm.coolwarm, aspect=3)
+#------------------------------------------------------------------------------ 
+    #------------------ plt.grid(b=True, which='x', color='white',linestyle='-')
+#------------------------------------------------------------------------------ 
+#------------------------------------------------------------------------------ 
+    # plt.xticks(np.linspace(-0.5,90.5,10), np.arange(200,2010,200), fontsize = 20)
+    #----------- plt.yticks(np.arange(0,11,1), np.arange(1,12,1), fontsize = 20)
+    #------------------------------- plt.xlabel('Number of trees',fontsize = 24)
+    #--------------------------- plt.ylabel('Number of features', fontsize = 24)
+    #---------------------------------------------- ax.yaxis.grid(False,'major')
+    #--------------------------------------------- ax.xaxis.grid(False, 'major')
+    # cb = fig.colorbar(cax, orientation='horizontal', pad = 0.15, shrink=1, aspect=50)
+    #------------------------------------------- cb.ax.tick_params(labelsize=14)
+    
+    
+    
+    
+
+
+
+#    ax.yaxis.set_major_locator(MultipleLocator(1))
+
+
+    
+#---------- #    ax.get_xaxis().set_major_locator(mpl.ticker.AutoMinorLocator())
+    #----------- ax.get_xaxis().set_minor_locator(mpl.ticker.AutoMinorLocator())
+    #----------- ax.get_yaxis().set_minor_locator(mpl.ticker.AutoMinorLocator())
+    #--------------- ax.grid(b=False, which='major', color='w', linewidth=0.001)
+    #--------------- ax.grid(b=False, which='minor', color='w', linewidth=0.001)
+    # cb = fig.colorbar(cax, orientation='horizontal', pad = 0.15, shrink=1, aspect=50)
+    #------------------------------------------- cb.ax.tick_params(labelsize=14)
+  
+#    plt.xticks(np.linspace(0,200,10),np.arange(100,2010,40), fontsize=14)
+ #   plt.yticks(np.linspace(-0.5,39.5,11),np.arange(-10,11,2), fontsize=14)
+  
+     
+    #===========================================================================
+    # ax = sns.heatmap(scores, cmap="coolwarm", )
+    # ax.set_aspect(3)
+    #===========================================================================
+    
+    
+    
+    
+    #--------------------------------------------- figg, axx = plt.subplots(1,2)
+    #--------- caxx = axx.imshow(scores, interpolation='none', origin='highest',
+                    #--------------------------- cmap=plt.cm.coolwarm, aspect=3)
+#------------------------------------------------------------------------------ 
+    #------------------ plt.grid(b=True, which='x', color='white',linestyle='-')
+#------------------------------------------------------------------------------ 
+#------------------------------------------------------------------------------ 
+    # plt.xticks(np.linspace(-0.5,90.5,10), np.arange(200,2010,200), fontsize = 20)
+    #----------- plt.yticks(np.arange(0,11,1), np.arange(1,12,1), fontsize = 20)
+#------------------------------------------------------------------------------ 
+    #--------------------------------------------- axx.yaxis.grid(False,'major')
+    #-------------------------------------------- axx.xaxis.grid(False, 'major')
+    
+    
+#    plt.show()  
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    #===========================================================================
+    # param_grid = dict(max_features=feature_range, n_estimators=tree_range) 
+    # 
+    # grid = GridSearchCV(RandomForestClassifier(), param_grid=param_grid, cv=10)
+    # grid.fit(train, trainlabel) 
+    # print("The best parameters are %s with a score of %0.2f"
+    #           % (grid.best_params_, grid.best_score_))     
+    # 
+    # scores = [x[1] for x in grid.grid_scores_]
+    # scores = np.array(scores).reshape(len(tree_range), len(feature_range))        
+    # scores = DataFrame(scores)
+    # print scores
+    #===========================================================================
+    
+    #-------------------------------------------------------- seed=["rf", "adb"]
+#------------------------------------------------------------------------------ 
+    #------------------------------------------------------------ for i in seed:
+        #------------------------------------------------------------ score = []
+        #-------------------------------------- for j in np.arange(10, 100, 10):
+#------------------------------------------------------------------------------ 
+            #--------------- forest = ff.trainforest(i, train, trainlabel, j, 4)
+            #-------------- score.append(tt.testforest(test, testlabel, forest))
+#------------------------------------------------------------------------------ 
+#------- #        score = score.set_index([range(0, len(np.arange(10,100,10)))])
+#---------------------------------------------------------- #        print score
+        #--------------------------------------------------------- df_2[i]=score
+#------------------------------------------------------------------------------ 
+    #------------------------------------- df_2.to_csv('new.csv', header = True)
         
 
     
     
     
-    ######################plot confusion matrix###############
+    ####################plot confusion matrix###############
     #------------------------------------------- cm=np.array([[17, 6], [4, 21]])
     #---------------------------------------------- tt.plot_confusion_matrix(cm)
-       
-    ###########################rf####################
+
+    ##########################rf####################
     #------------------------------------------------------- score_input_rf = []
 #-------------------------------------------------------------------- #    d = 0
     #----------------------------------------------------------- for i in spanx:
@@ -78,7 +344,7 @@ def main():
         #---------------------------- LL= tt.testforest(test, testlabel, forest)
         #--------------------------------------------- score_input_rf.append(LL)
 #----------------------------------------------------------------- #       d=d+1
-# #        print "Now we finish  %d epoch, there are %r in all" %(d, len(spanx)-d)
+ # #        print "Now we finish  %d epoch, there are %r in all" %(d, len(spanx)-d)
 #------------------------------------------------------------------------------ 
     #------------------------------------------------ df_2['rf2']=score_input_rf
     #------------------- df_2.to_csv('score_long_2features_rf.csv', header=True)
@@ -153,6 +419,8 @@ def main():
     #------------------------------------------------------- print "finshed one"
     #---------------------------------------------- df_2['gbt4']=score_input_gbt
     #------------------ df_2.to_csv('score_long_4features_gbt.csv', header=True)
+    
+    
 # ##########################finish one circle ########################################
 #------------------------------------------------------------------------------ 
     #------------------------- ###########################rf####################
@@ -260,13 +528,7 @@ def main():
     
     
 #   plt.plot(spanx, score_input_bag)
-    stop = timeit.default_timer()
-    print "The running takes %r s" %(stop-start)
 
-    
-    
-if __name__ == '__main__':
-    main()    
     
     
     
@@ -431,34 +693,3 @@ if __name__ == '__main__':
 
 
 
-#dependences of features 
-#feature_set = (8,9)
-#feature_names=["feature 0", "1","2","3","4",""""""""""""""""""""""""]
-#ff.dependence3d(forest, train, feature_set)
-
-
-"""calculate the output one by one"""
-
-    #------------------ forest = ff.trainforest('bag', train, trainlabel, 10000)
-    #------------------------------- bag= tt.testforest(test, testlabel, forest)
-#------------------------------------------------------------------------------ 
-    #------------------ forest = ff.trainforest('adb', train, trainlabel, 10000)
-    #------------------------------ adb = tt.testforest(test, testlabel, forest)
-#------------------------------------------------------------------------------ 
-    #------------------- forest = ff.trainforest('rf', train, trainlabel, 10000)
-    #------------------------------- rf = tt.testforest(test, testlabel, forest)
-#------------------------------------------------------------------------------ 
-    #------------------ forest = ff.trainforest('ext', train, trainlabel, 10000)
-    #------------------------------ ext = tt.testforest(test, testlabel, forest)
-#------------------------------------------------------------------------------ 
-    #------------------ forest = ff.trainforest('gbt', train, trainlabel, 10000)
-    #------------------------------ gbt = tt.testforest(test, testlabel, forest)
-#------------------------------------------------------------------------------ 
-    #----------- test_bag= {'bag':bag, 'adb':adb, 'rf':rf, 'ext':ext, 'gbt':gbt}
-#------------------------------------------------------------------------------ 
-#------------------------------------------------------------------------------ 
-    #---------------------------------------------- test_bag=DataFrame(test_bag)
-#------------------------------------------------------------------------------ 
-#----------------------------------------------------------- #    print test_bag
-#------------------------------------------------------------------------------ 
-    #-------------------------- test_bag.to_csv('test_bag_try.csv', header=True)

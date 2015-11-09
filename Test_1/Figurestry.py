@@ -21,9 +21,12 @@ import TAmlp as mlp
 import TAdbn as dbn
 import TAsda as sda
 from scipy.interpolate import spline
+import seaborn as sns
+from IPython.core.pylabtools import figsize
 
 
 df_2 = pd.read_csv('/home/peng/git/Machine_learning_for_reliability_analysis//Test_1/score_long_10features_gbt.csv', header=0)
+
 #------------------------ ind = np.arange(N)    # the x locations for the groups
 #------- width = 0.35       # the width of the bars: can also be len(x) sequence
 #------------------------------------------------------------------------------ 
@@ -202,13 +205,14 @@ power_line_gbt = spline(spanx, df_2['gbt10'], x_new)
 #plt.plot(x_new, power_line_ext, linewidth = 1.5, label ='AdaBoosting', color='#DC143C')
 #plt.plot(x_new, power_line_gbt, linewidth = 1.5, label='GTB', color='#00aaff')
 
+figsize(8,5)
+plt.plot(spanx, df_2['rf10'], linewidth = 1, label='RF', color ='#00aa00')
+plt.plot(spanx, df_2['rf8'], linewidth = 1, label ='ERT', color='#DC143C')
+plt.plot(spanx, df_2['rf6'], linewidth = 1, label='GTB', color='#00aaff')
+#######line plot without smoothing###################
 
-#---- plt.plot(spanx, df_2['rf10'], linewidth = 1, label='RF', color ='#00aa00')
-#-- plt.plot(spanx, df_2['ext10'], linewidth = 1, label ='ERT', color='#DC143C')
-#--- plt.plot(spanx, df_2['gbt10'], linewidth = 1, label='GTB', color='#00aaff')
-########line plot without smoothing###################
-plt.plot(spanx, df_2['bag'],linewidth = 1, label ='Bagging', color='#00aa00' )
-plt.plot(spanx, df_2['adb'],linewidth = 1, label ='AdaBoosting', color='#00aaff' )
+# plt.plot(spanx, df_2['rf10'],linewidth = 1, label ='Bagging', color='#00aa00' )
+# plt.plot(spanx, df_2['ext10'],linewidth = 1, label ='AdaBoosting', color='#00aaff' )
 
  #----------------------------------- plt.plot(spanx, df_2['rf2'], linewidth = 2)
  #---------------------------------- plt.plot(spanx, df_2['ext2'], linewidth = 2)
@@ -222,9 +226,9 @@ plt.xticks(np.arange(0,10010,2000))
 
 plt.xlabel('Number of trees', fontsize=24)
 plt.ylabel('Accuracy', fontsize=24)
-plt.legend(fontsize=20, frameon=False)
+plt.legend(fontsize=20, frameon=False, loc='lower right')
 plt.xlim([0, 10000])
-plt.ylim([0.5, 0.95])
+plt.ylim([0.55, 0.85])
 plt.show()
 
 
