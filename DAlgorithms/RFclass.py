@@ -22,6 +22,9 @@ from sklearn import metrics
 from sklearn.metrics import recall_score, precision_score
 from sklearn.metrics.scorer import make_scorer
 import re
+from IPython.core.pylabtools import figsize
+from sklearn.tree import DecisionTreeClassifier
+
 
 class training(object):
     def __init__(self):
@@ -33,7 +36,8 @@ class training(object):
                       'bag': BaggingClassifier(n_estimators= number_trees),
                       'ext': ExtraTreesClassifier(n_estimators= number_trees, max_features=number_features),
                       'gbt': GradientBoostingClassifier(n_estimators= number_trees, max_features=number_features),
-                      'bagging': RandomForestClassifier(n_estimators= number_trees, max_features=12)}
+                      'bagging': RandomForestClassifier(n_estimators= number_trees, max_features=12),
+                      'cart': DecisionTreeClassifier(criterion='entropy')}
         rawforest=seed_of_tree[seed]
         forest=rawforest.fit(train,trainlabel)
         outputtrain= forest.predict(train)
@@ -165,7 +169,31 @@ class training(object):
             datametrics[number_features]=score1
         return datametrics
 
-
+    def trainman_sensitivity_CV(self, seed, train, trainlabel, tree_range, feature_range):
+# this is for sensitivity tests for 10cv only!
+         
+        
+        k_fold = cross_validation.KFold(len(train), n_folds = 10)
+        datametrics = DataFrame({'tree_range': tree_range})
+        
+        for number_features in feature_range:
+        #    score1=[]
+            for number_trees in tree_range:
+                
+                seed_of_tree = {'rf': RandomForestClassifier(n_estimators= number_trees, max_features=number_features), 
+                  'adb': AdaBoostClassifier(n_estimators= number_trees),
+                  'bag': BaggingClassifier(n_estimators= number_trees),
+                  'ext': ExtraTreesClassifier(n_estimators= number_trees, max_features=number_features),
+                  'gbt': GradientBoostingClassifier(n_estimators= number_trees, max_features=number_features),
+                  'bagging': RandomForestClassifier()}
+                   
+                rawforest = seed_of_tree[seed]
+                                
+            return training.mean_scores(self, train, trainlabel, rawforest, k_fold)
+        
+                
+           # datametrics[number_features]=score1
+        #return datametrics
 
     
     
@@ -273,7 +301,7 @@ class training(object):
         #  pretty init view
         ax.view_init(elev=22, azim=122)
         plt.colorbar(surf)
-        plt.suptitle('Partial dependence of house value on median age and '
+        plt.suptitle('Partial dependence of house value on me12dian age and '
                     'average occupancy')
         plt.subplots_adjust(top=0.9)
         
@@ -301,7 +329,37 @@ class training(object):
             fn.append(np.float(raw_met7[2]))
             tp.append(np.float(raw_met7[3]))
             
-        return pd.DataFrame({'tn':tn, 'fp':fp, 'fn':fn, 'tp':tp})        
+        return pd.DataFrame({'tn':tn, 'fp':fp, 'fn':fn, 'tp':tp})
+    
+    def precision(self, x):
+        tn = x['tn']
+        tp = x['tp']
+        fn = x['fn']
+        fp = x['fp']
+        
+        return tp/(tp + fp)
+    
+    def recall(self, x):  
+        tn = x['tn']
+        tp = x['tp']
+        fn = x['fn']
+        fp = x['fp']
+        return tp / (tp + fn)    
+    
+    def accuracy(self, x):
+        tn = x['tn']
+        tp = x['tp']
+        fn = x['fn']
+        fp = x['fp']
+        
+        return (tp+tn)/(tp + fp + tn + fn)
+    
+    def f1score(self, x):
+        
+        precision = training.precision(self,x)
+        recall = training.recall(self, x)  
+        
+        return 2*(precision * recall)/(precision + recall)
 
 class test():    
     def __init__(self):
@@ -381,7 +439,7 @@ class test():
 
                     ax.annotate(str(cm[y][x]), xy=(x, y),
                             horizontalalignment='center',
-                             verticalalignment='center', fontsize=40, color='#00aaff', fontweight='bold')
+                             verticalalignment='center', fontsize=40, color='#000000', fontweight='bold')
         
         cb = fig.colorbar(res)
         cb.ax.tick_params(labelsize=14)
@@ -392,5 +450,41 @@ class test():
         plt.xlabel('Predicted class', fontsize=24)
         plt.ylabel('True class', fontsize = 24)
         plt.show()
-
+    
+    def plot_gridsearch(self,x, aspect = 3):
+        scores=np.array(x)
+        scores=scores[:, 1:].T
+        #    print scores
+        #scores= scores[:,5:]
+        print np.shape(scores)
+        
+        #    print np.arange(100,2010,20)
+        
+        figsize(16,8)
+        fig, ax = plt.subplots(1,1)
+        cax = ax.imshow(scores, interpolation='none', origin='highest',
+                        cmap=plt.cm.coolwarm, aspect=aspect)
+        
+        plt.grid(b=True, which='x', color='white',linestyle='-')
+        
+        plt.xlim(0,96)
+        
+        plt.xticks((-0.5, 96.5), (100,2000), fontsize = 20)        
+#        plt.xticks(np.linspace(0,194,10), int(np.linspace(100,4000,10)), fontsize = 20)
+        plt.yticks(np.arange(0,11,1), np.arange(1,12,1), fontsize = 20)
+        plt.xlabel('Number of trees',fontsize = 24)
+        plt.ylabel('Number of features', fontsize = 24)
+        ax.yaxis.grid(False,'major')
+        ax.xaxis.grid(False, 'major')
+        cb = fig.colorbar(cax, orientation='horizontal', pad = 0.15, shrink=1, aspect=50)
+        cb.ax.tick_params(labelsize=14)
+        #----------------------------------------------------------- scores=np.array(df)
+        #------------------------------------------------------ scores=scores[:, 2:13].T
+        #-------------------- plt.imshow(scores, interpolation='None', origin='highest',
+                      #--------------------------------- cmap=plt.cm.coolwarm, aspect=3)
+        #------------------------------------------------------------------------------ 
+        #-------------- cb = plt.colorbar(orientation='horizontal', shrink=1, aspect=50)
+        #---------------------------------------------- #sns.axes_style(axes.grid=False)
+        #-------------------------------------------------------------------- plt.show()
+        plt.show()
 

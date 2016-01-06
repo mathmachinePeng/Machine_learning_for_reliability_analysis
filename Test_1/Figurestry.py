@@ -25,7 +25,7 @@ import seaborn as sns
 from IPython.core.pylabtools import figsize
 
 
-df_2 = pd.read_csv('/home/peng/git/Machine_learning_for_reliability_analysis//Test_1/score_long_10features_gbt.csv', header=0)
+#df_2 = pd.read_csv('/home/peng/git/Machine_learning_for_reliability_analysis//Test_1/score_long_10features_gbt.csv', header=0)
 
 #------------------------ ind = np.arange(N)    # the x locations for the groups
 #------- width = 0.35       # the width of the bars: can also be len(x) sequence
@@ -40,6 +40,76 @@ df_2 = pd.read_csv('/home/peng/git/Machine_learning_for_reliability_analysis//Te
 #------------------------- p5 = plt.bar(ind, gbt, width, color='g', label='GTB',
              #------------------------------------------------------ bottom=ext)
 #------------------------------------------------------------------------------ 
+
+N = 5
+
+
+ind = np.arange(N)  # the x locations for the groups
+width = 0.2       # the width of the bars
+acc = (0.69,  0.75, 0.75, 0.69,0.75)
+
+fig, ax = plt.subplots(figsize = (8,6.5))
+rects1 = ax.bar(ind, acc, width,color='c')
+
+prec = (0.80,  0.83, 0.83, 0.71,0.83)
+rects2 = ax.bar(ind + width, prec, width)
+#add some text for labels, title and axes ticks
+ax.set_xlabel('Classification metrics', fontsize=24)
+#ax.set_title('Ensemble methods')
+ax.set_xticks(ind + width)
+ax.set_xticklabels(('Bagging',  'RF', 'ERT', 'AdaBoosting','GTB'))
+plt.ylim(0.5,1)
+plt.yticks(fontsize = 14)
+plt.xticks(fontsize = 14)
+plt.ylabel('Scores', fontsize=24)
+
+ax.legend((rects1[0], rects2[0]), ('Accuracy', 'Precision'),fontsize=20)
+
+
+#===============================================================================
+# def autolabel(rects):
+#     # attach some text labels
+#     for rect in rects:
+#         height = rect.get_height()
+#         ax.text(rect.get_x() + rect.get_width()/2., 1.05*height,
+#                 '%d' % int(height),
+#                 ha='center', va='bottom')
+#===============================================================================
+
+
+
+
+##plot the metrics comparison for 6633 splitting
+#------------------------------------------------------------------------- N = 5
+#-------------------------- ind = np.arange(N)  # the x locations for the groups
+#------------------------------------- width = 0.2       # the width of the bars
+#------------------------------------------ acc = (0.81, 0.78, 0.81, 0.80, 0.83)
+#------------------------------------------------------------------------------ 
+#------------------------------------- fig, ax = plt.subplots(figsize = (8,6.5))
+#------------------------------------ rects1 = ax.bar(ind, acc, width,color='c')
+#------------------------------------------------------------------------------ 
+#----------------------------------------- prec = (0.82, 0.81, 0.82, 0.79, 0.85)
+#------------------------------------- rects2 = ax.bar(ind + width, prec, width)
+#------------------------------ # add some text for labels, title and axes ticks
+#-------------------------- ax.set_ylabel('Classification metrics', fontsize=24)
+#--------------------------------------------- #ax.set_title('Ensemble methods')
+#---------------------------------------------------- ax.set_xticks(ind + width)
+#------------ ax.set_xticklabels(('Bagging', 'AdaBoosting', 'RF', 'ERT', 'GTB'))
+#--------------------------------------------------------------- plt.ylim(0.5,1)
+#----------------------------------------------------- plt.yticks(fontsize = 14)
+#----------------------------------------------------- plt.xticks(fontsize = 14)
+#--------------------------------------------- plt.xlabel('Scores', fontsize=24)
+#------------------------------------------------------------------------------ 
+#------ ax.legend((rects1[0], rects2[0]), ('Accuracy', 'Precision'),fontsize=20)
+# #===============================================================================
+#----------------------------------------------------------- # autolabel(rects1)
+#----------------------------------------------------------- # autolabel(rects2)
+# #===============================================================================
+
+plt.show()
+
+
+
 
 
 
@@ -191,45 +261,6 @@ cnames = {
 
 
 
-#df_2=  df_2[df_2['count']%2 ==0]
-spanx = df_2['trees']
-
-
-#
-x_new = np.linspace(spanx.min(), spanx.max(), 1000)
-power_line_rf = spline(spanx, df_2['rf10'], x_new)
-power_line_ext = spline(spanx, df_2['ext10'], x_new)
-power_line_gbt = spline(spanx, df_2['gbt10'], x_new)
-
-#plt.plot(x_new, power_line_rf, linewidth = 1.5, label='Bagging', color =cnames['violet'])
-#plt.plot(x_new, power_line_ext, linewidth = 1.5, label ='AdaBoosting', color='#DC143C')
-#plt.plot(x_new, power_line_gbt, linewidth = 1.5, label='GTB', color='#00aaff')
-
-figsize(8,5)
-plt.plot(spanx, df_2['rf10'], linewidth = 1, label='RF', color ='#00aa00')
-plt.plot(spanx, df_2['rf8'], linewidth = 1, label ='ERT', color='#DC143C')
-plt.plot(spanx, df_2['rf6'], linewidth = 1, label='GTB', color='#00aaff')
-#######line plot without smoothing###################
-
-# plt.plot(spanx, df_2['rf10'],linewidth = 1, label ='Bagging', color='#00aa00' )
-# plt.plot(spanx, df_2['ext10'],linewidth = 1, label ='AdaBoosting', color='#00aaff' )
-
- #----------------------------------- plt.plot(spanx, df_2['rf2'], linewidth = 2)
- #---------------------------------- plt.plot(spanx, df_2['ext2'], linewidth = 2)
- #---------------------------------- plt.plot(spanx, df_2['gbt2'], linewidth = 2)
-
-plt.xticks(spanx ,fontsize = 14)
-plt.yticks(fontsize = 14)
-plt.xticks(np.arange(0,10010,2000))
-
-#plt.ticklabel_format(axis='x', style='sci',scilimits=(1,3))
-
-plt.xlabel('Number of trees', fontsize=24)
-plt.ylabel('Accuracy', fontsize=24)
-plt.legend(fontsize=20, frameon=False, loc='lower right')
-plt.xlim([0, 10000])
-plt.ylim([0.55, 0.85])
-plt.show()
 
 
 

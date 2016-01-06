@@ -24,6 +24,7 @@ from sklearn.metrics import recall_score, precision_score
 from sklearn.metrics.scorer import make_scorer
 from matplotlib.ticker import MultipleLocator, FormatStrFormatter
 from sklearn.ensemble import RandomForestClassifier, AdaBoostClassifier, BaggingClassifier, ExtraTreesClassifier, GradientBoostingClassifier
+from sklearn.tree import DecisionTreeClassifier
 # process data into scaled training and testing
 
 
@@ -32,6 +33,7 @@ from sklearn.ensemble import RandomForestClassifier, AdaBoostClassifier, Bagging
 
 def main():
     start = timeit.default_timer()
+    
     df =pd.read_csv('/home/peng/new160half.csv', header=0)
  #   df['random_number']=np.random.random(size = 160)
   #  df_sort = df.sort(columns='random_number')
@@ -41,34 +43,78 @@ def main():
     p= Preprocessdata.standardprocess()
 # #    df_2 = pd.read_csv('/home/peng/git/Machine_learning_for_reliability_analysis//Test_1/score_long_2features_rf.csv', header=0)
 #------------------------------------------------------------------------------ 
-    train, trainlabel, test, testlabel =p.noscale(df,0.666666)
+    train, trainlabel, test, testlabel =p.noscale(df,0.9)
 #    train, trainlabel = p.noaction(df)
 # #    df_2 = pd.read_csv('/home/peng/git/Machine_learning_for_reliability_analysis/score50-500_2.csv', header=0)
     
-    count = 0
-
-    for i in testlabel:
-        if i==0:
-            count=count+1
-    print count
-        
-
-
-
-
- #===============================================================================
     ff=RFclass.training()
     tt = RFclass.test()
     feature_range=np.arange(12,13,1)
-    tree_range = np.arange(100,4000,20)
-    forest = ff.trainforest('ext', train, trainlabel, 100, 11)
-    y_pred = forest.predict(test)
-    cm = metrics.confusion_matrix(testlabel, y_pred)
-    print cm
-    print cm.flatten()
-
+    tree_range = np.arange(700,701,1)
     
+    
+    
+ 
+#####################sensitivity for 10cv##############    
+    #---------------------------------------------------------------- score = []
+    #------------------------------------------------------ for i in range(100):
+        # score.append(ff.trainman_sensitivity_CV('adb', train, trainlabel, tree_range, feature_range))
+#-------------------------------------------------------------- #    print score
+    #- df_raw_times = pd.DataFrame({'times':np.arange(1,101,1), 'scores':score})
+#------------------------------------------------------------------------------ 
+    #----------------------- df_raw_times = ff.str_float(df_raw_times['scores'])
+#------------------------------------------------------------------------------ 
+    #---------------------------------- df_acc_times = ff.accuracy(df_raw_times)
+    #-- df_acc_times.to_csv('adb_acc_10cv_f12_t700_100times.csv', header = True)
+
+
+
+    """Just separate"""
+    #===========================================================================
+    # forest= ff.trainforest('ext', train, trainlabel,1900,9)
+    # y_pred = forest.predict(test)
+    # print metrics.precision_score(testlabel,y_pred)
+    # cm = metrics.confusion_matrix(testlabel, y_pred)
+    # tt.plot_confusion_matrix(cm)
+    #===========================================================================
+    
+    
+    """the CART single tree"""
+    
+    forest = ff.trainforest('cart', train, trainlabel,20,1)
+    y_pred = forest.predict(test)
+    print metrics.accuracy_score(testlabel,y_pred)
+    print metrics.precision_score(testlabel,y_pred)
+    cm = metrics.confusion_matrix(testlabel, y_pred)
     tt.plot_confusion_matrix(cm)
+    
+    
+
+    #---------------------------------------------------------------- score = []
+    #------------------------------------------------------ for i in range(100):
+        #----------- forest = ff.trainforest('adb', train, trainlabel, 1450, 11)
+        #----------------------------------------- y_pred = forest.predict(test)
+        #--------------- score.append(metrics.accuracy_score(testlabel, y_pred))
+#------------------------------------------------------------------------------ 
+    #--------- df=pd.DataFrame({'times': np.arange(1,101,1), 'acc_score':score})
+    #--------------- df.to_csv('adb_acc_63_f12_t1450_100times.csv', header=True)
+    #------------------------------------------------------- print df.describe()
+#------------------------------------------------------------------------------ 
+#------------------------------------------------------------------------------ 
+#------------------------------------------------------------------------------ 
+    # df = pd.read_csv('/home/peng/git/Machine_learning_for_reliability_analysis/Test_1/adb_acc_63_f12_t1450_100times.csv', header=0)
+    #------------------------------------ plt.plot(df['times'], df['acc_score'])
+ #   plt.xticks(np.arange(1,101,1),np.arange(1,101,1))
+#    plt.xlabel()
+    plt.show()
+
+
+
+
+
+
+
+############################################################################################################################
     
     #------------------------------------- df_66_33 = {'tree_tange': tree_range}
     #---------------------------------------------- df_all = DataFrame(df_66_33)
