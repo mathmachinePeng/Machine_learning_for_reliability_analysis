@@ -13,13 +13,14 @@ from sklearn import preprocessing, cross_validation
 import matplotlib.pyplot as plt
 from sklearn.metrics.classification import accuracy_score, confusion_matrix, classification_report
 import csv
+from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor 
 from sklearn.ensemble import RandomForestClassifier, AdaBoostClassifier, BaggingClassifier, ExtraTreesClassifier, GradientBoostingClassifier
 from sklearn.ensemble.partial_dependence import plot_partial_dependence
 from sklearn.ensemble.partial_dependence import partial_dependence
 from mpl_toolkits.mplot3d import Axes3D
 from sklearn.grid_search import GridSearchCV
 from sklearn import metrics
-from sklearn.metrics import recall_score, precision_score
+from sklearn.metrics import recall_score, precision_score, r2_score
 from sklearn.metrics.scorer import make_scorer
 import re
 from IPython.core.pylabtools import figsize
@@ -37,11 +38,13 @@ class training(object):
                       'ext': ExtraTreesClassifier(n_estimators= number_trees, max_features=number_features),
                       'gbt': GradientBoostingClassifier(n_estimators= number_trees, max_features=number_features),
                       'bagging': RandomForestClassifier(n_estimators= number_trees, max_features=12),
-                      'cart': DecisionTreeClassifier(criterion='entropy')}
+                      'cart': DecisionTreeClassifier(criterion='entropy'),
+                      'rf_regress': RandomForestRegressor(n_estimators= number_trees, max_features=number_features)}
         rawforest=seed_of_tree[seed]
         forest=rawforest.fit(train,trainlabel)
         outputtrain= forest.predict(train)
-        accuracytrain = accuracy_score(trainlabel, outputtrain)        
+        print r2_score(trainlabel, outputtrain) 
+#        accuracytrain = accuracy_score(trainlabel, outputtrain)        
 #        print "The size of the training set is %r , %r" %(np.shape(train)[0],np.shape(train)[1])
         #---------------------------------------- print "The method is %r" %seed
         # print "The accuracy for the training set is %r" %accuracytrain, "and the confusion matrix is"
@@ -306,6 +309,9 @@ class training(object):
         plt.subplots_adjust(top=0.9)
         
         plt.show()
+        
+        
+        
     def str_float(self, x):
         tn = []
         fp = []
@@ -372,7 +378,12 @@ class test():
         accuracytrain = accuracy_score(testlabel, outputtest)
         
         return accuracytrain
-        
+    
+    def testforest_R(self, test, testlabel, forest):
+        outputtest= forest.predict(test) 
+        return r2_score(testlabel, outputtest)
+                  
+    
     
     def testforest_confu(self, test, testlabel,forest):
         outputtest= forest.predict(test) 
@@ -453,14 +464,14 @@ class test():
     
     def plot_gridsearch(self,x, aspect = 3):
         scores=np.array(x)
-        scores=scores[:, 1:].T
+        scores=scores[:, 2:].T
         #    print scores
         #scores= scores[:,5:]
         print np.shape(scores)
         
         #    print np.arange(100,2010,20)
         
-        figsize(16,8)
+        figsize(16,5)
         fig, ax = plt.subplots(1,1)
         cax = ax.imshow(scores, interpolation='none', origin='highest',
                         cmap=plt.cm.coolwarm, aspect=aspect)
@@ -469,14 +480,16 @@ class test():
         
         plt.xlim(0,96)
         
-        plt.xticks((-0.5, 96.5), (100,2000), fontsize = 20)        
+        plt.xticks((-0.5,20,45,70, 96.5), (100,500,1000,1500,2000), fontsize = 20)        
 #        plt.xticks(np.linspace(0,194,10), int(np.linspace(100,4000,10)), fontsize = 20)
         plt.yticks(np.arange(0,11,1), np.arange(1,12,1), fontsize = 20)
         plt.xlabel('Number of trees',fontsize = 24)
         plt.ylabel('Number of features', fontsize = 24)
         ax.yaxis.grid(False,'major')
         ax.xaxis.grid(False, 'major')
-        cb = fig.colorbar(cax, orientation='horizontal', pad = 0.15, shrink=1, aspect=50)
+        #cb = fig.colorbar(cax, orientation='horizontal', pad = 0.15, shrink=1, aspect=50)
+        #cb = fig.colorbar(cax, orientation='vertical', shrink=2, aspect=2)
+        cb = fig.colorbar(cax, orientation='vertical',shrink=1, aspect=20)
         cb.ax.tick_params(labelsize=14)
         #----------------------------------------------------------- scores=np.array(df)
         #------------------------------------------------------ scores=scores[:, 2:13].T
@@ -486,5 +499,6 @@ class test():
         #-------------- cb = plt.colorbar(orientation='horizontal', shrink=1, aspect=50)
         #---------------------------------------------- #sns.axes_style(axes.grid=False)
         #-------------------------------------------------------------------- plt.show()
+        plt.tight_layout()
         plt.show()
 

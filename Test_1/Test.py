@@ -18,14 +18,11 @@ import TAsda as sda
 from scipy.interpolate import spline
 
 
-y=[]
-for i in np.arange(2):
-    y.append(i+2)
-c = np.mean(y)    
-print y,c
-#print df_2[df_2['gbt']== df_2['gbt'].max()]
-#----------- feautre_2 = [0.812500,   0.770833,   0.812500,   0.791667, 0.8125 ]
-#-------- feature_4 = [0.812500,   0.770833,   0.791667,   0.812500,  0.833333 ]
-#-------- feature_6 = [0.812500,   0.770833,   0.812500,   0.833333,  0.812500 ]
-#-------- feature_8 = [0.812500,   0.770833,   0.791667,   0.812500,  0.812500 ]
-#--------------- cls = [ 'rf',        'adb' ,       'bag'    ,    'ext' , 'gbt']
+import tensorflow as tf
+
+hello = tf.constant('hello, TensorFlow')
+sess = tf.Session()
+print sess.run(hello)
+a = tf.constant(10)
+b = tf.constant(10)
+print sess.run(a+b)

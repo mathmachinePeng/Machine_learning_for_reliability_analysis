@@ -70,19 +70,21 @@ pp = Superplot.fancy()
 #-------------------------------------------------------------------- plt.show()
 
 
-##########################plot ##########################
-# df1= pd.read_csv('/home/peng/git/Machine_learning_for_reliability_analysis/Test_1/Results/statistical_csv/bag_acc_63_100_4000.csv', header=0)
+#########################plot grid for bagging and adaboosting ##########################
+# df1= pd.read_csv('/home/peng/git/Machine_learning_for_reliability_analysis/Test_1/Results/statistical_csv/adb_acc_10cv_100_4000.csv', header=0)
 #------------------------------------------------------------------------------ 
-# df2= pd.read_csv('/home/peng/git/Machine_learning_for_reliability_analysis/Test_1/Results/statistical_csv/bag_prec_63_100_4000.csv', header=0)
+# df2= pd.read_csv('/home/peng/git/Machine_learning_for_reliability_analysis/Test_1/Results/statistical_csv/adb_prec_10cv_100_4000.csv', header=0)
 #------------------------------------------------------------------------------ 
-# #df3= pd.read_csv('/home/peng/git/Machine_learning_for_reliability_analysis/Test_1/Results/statistical_csv/Sensitivity/bag_acc_63_f12_t1000_100times.csv', header=0)
+ # #df3= pd.read_csv('/home/peng/git/Machine_learning_for_reliability_analysis/Test_1/Results/statistical_csv/Sensitivity/bag_acc_63_f12_t1000_100times.csv', header=0)
 #------------------------------------------------------------------------------ 
-# #df4= pd.read_csv('/home/peng/git/Machine_learning_for_reliability_analysis/Test_1/Results/statistical_csv/Sensitivity/bag_prec_63_f12_t1000_100times.csv', header=0)
+ # #df4= pd.read_csv('/home/peng/git/Machine_learning_for_reliability_analysis/Test_1/Results/statistical_csv/Sensitivity/bag_prec_63_f12_t1000_100times.csv', header=0)
 #----------------------------------------------------------------- figsize(10,8)
-# plt.plot(df1['tree_range'][0:96], df1['12'][0:96], label = '66:33 splitting accuracy')
-# plt.plot(df1['tree_range'][0:96], df2['12'][0:96], label = '66:33 splitting precision')
+#-------- plt.plot(df1['tree_range'][0:96], df1['12'][0:96], label = 'Accuracy')
+#------- plt.plot(df1['tree_range'][0:96], df2['12'][0:96], label = 'Precision')
 #---------------------------------- plt.xlabel('Number of trees', fontsize = 24)
-#--------------------------- plt.ylabel('Classification metrics', fontsize = 24)
+#------------------------------------------- plt.ylabel('Scores', fontsize = 24)
+#------------------------------------------------------------ plt.xlim(100,2000)
+# plt.xticks((100, 500,1000,1500,2000), (100,500,1000,1500,2000), fontsize = 20)
 #----------------------------------------------------- plt.xticks(fontsize = 20)
 #----------------------------------------------------- plt.yticks(fontsize = 20)
 #----------------------------------------------------- plt.legend(fontsize = 20)
@@ -95,38 +97,39 @@ pp = Superplot.fancy()
 
 ################################# plot sensitivity ######################################################
 
-# df1= pd.read_csv('/home/peng/git/Machine_learning_for_reliability_analysis/Test_1/Results/statistical_csv/Sensitivity/rf_acc_63_f11_t800_100times.csv', header=0)
+# df1= pd.read_csv('/home/peng/git/Machine_learning_for_reliability_analysis/Test_1/Results/statistical_csv/Sensitivity/gbt_acc_10cv_f7_t1000_100times.csv', header=0)
 #------------------------------------------------------------------------------ 
-# df2= pd.read_csv('/home/peng/git/Machine_learning_for_reliability_analysis/Test_1/Results/statistical_csv/Sensitivity/rf_prec_63_f11_t800_100times.csv', header=0)
+# df2= pd.read_csv('/home/peng/git/Machine_learning_for_reliability_analysis/Test_1/Results/statistical_csv/Sensitivity/gbt_prec_10cv_f9_t1900_100times.csv', header=0)
 #------------------------------------------------------------------------------ 
- # #df3= pd.read_csv('/home/peng/git/Machine_learning_for_reliability_analysis/Test_1/Results/statistical_csv/Sensitivity/bag_acc_63_f12_t1000_100times.csv', header=0)
+  # #df3= pd.read_csv('/home/peng/git/Machine_learning_for_reliability_analysis/Test_1/Results/statistical_csv/Sensitivity/bag_acc_63_f12_t1000_100times.csv', header=0)
 #------------------------------------------------------------------------------ 
- # #df4= pd.read_csv('/home/peng/git/Machine_learning_for_reliability_analysis/Test_1/Results/statistical_csv/Sensitivity/bag_prec_63_f12_t1000_100times.csv', header=0)
+  # #df4= pd.read_csv('/home/peng/git/Machine_learning_for_reliability_analysis/Test_1/Results/statistical_csv/Sensitivity/bag_prec_63_f12_t1000_100times.csv', header=0)
 #----------------------------------------------------------------- figsize(10,8)
-#------------ plt.plot(df1['times'], df1['acc_score'], label = '66:33 accuracy')
-#---------- plt.plot(df1['times'], df2['prec_score'], label = '66:33 precision')
+#------------------ plt.plot(df1['times'], df1['acc_score'], label = 'Accuracy')
+#---------------- plt.plot(df1['times'], df2['prec_score'], label = 'Precision')
 #-------------------------------------------- plt.xlabel('Times', fontsize = 24)
-#--------------------------- plt.ylabel('Classification metrics', fontsize = 24)
+#------------------------------------------- plt.ylabel('Scores', fontsize = 24)
+#---------------------------------------------------------- plt.ylim(0.73,0.785)
 #----------------------------------------------------- plt.xticks(fontsize = 20)
 #----------------------------------------------------- plt.yticks(fontsize = 20)
 #----------------------------------------------------- plt.legend(fontsize = 20)
-#----------- #plt.plot(df1['times'], df3['acc_score'], label = '66:33 accuracy')
-#---------- #plt.plot(df1['times'], df4['prec_score'], label = '66:33 accuracy')
+#plt.plot(df1['times'], df3['acc_score'], label = '66:33 accuracy')
+#plt.plot(df1['times'], df4['prec_score'], label = '66:33 accuracy')
+
+
+#plt.show()
+
+############Unknown things################
+# df1= pd.read_csv('/home/peng/git/Machine_learning_for_reliability_analysis/Test_1/Results/statistical_csv/Sensitivity/adb_acc_10cv_f12_t700_100times.csv', header=0)
+# #------------------------------------------------------------------------------
+# df2= pd.read_csv('/home/peng/git/Machine_learning_for_reliability_analysis/Test_1/Results/statistical_csv/Sensitivity/adb_prec_10cv_f12_t700_100times.csv', header=0)
 #------------------------------------------------------------------------------ 
+#--------------------------------------------------------------- statis_des = []
 #------------------------------------------------------------------------------ 
-#-------------------------------------------------------------------- plt.show()
-
-
-df1= pd.read_csv('/home/peng/git/Machine_learning_for_reliability_analysis/Test_1/Results/statistical_csv/Sensitivity/adb_acc_10cv_f12_t700_100times.csv', header=0)
+#-------------------------------- statis_des.append(df1['acc_score'].describe())
+#------------------------------- statis_des.append(df2['prec_score'].describe())
 #------------------------------------------------------------------------------ 
-df2= pd.read_csv('/home/peng/git/Machine_learning_for_reliability_analysis/Test_1/Results/statistical_csv/Sensitivity/adb_prec_10cv_f12_t700_100times.csv', header=0)
-
-statis_des = []
-
-statis_des.append(df1['acc_score'].describe())
-statis_des.append(df2['prec_score'].describe())
-
-print statis_des
+#-------------------------------------------------------------- print statis_des
 
 #------------------------ #df_10cv = DataFrame({'tree_range': df['tree_range']})
 #---------------------------- df_1 = DataFrame({'tree_range': df['tree_range']})
@@ -151,9 +154,24 @@ print statis_des
 
 #pp.roll_mean_std(df, 'tree_range', '12','Number of trees', 10)
 
+#################################str_plot############################################
+
+# df_rf= pd.read_csv('/home/peng/git/Machine_learning_for_reliability_analysis/Test_1/Results/panel400_crazy100-4000/gbt_crazy100_4000n.csv', header=0)
+#--------------------- df_rf_acc = DataFrame({'tree_range':df_rf['tree_range']})
+#--------------------------------------------------------------- print df_rf_acc
+#-------------------------------------------------------- for i in xrange(1,12):
+    #---------------------------------- new_str = ff.str_float(df_rf[np.str(i)])
+    #------------------------------ df_rf_acc[np.str(i)] = ff.precision(new_str)
+#------------------------------------------------------------------------------ 
+#---------------------------------------------------- print df_rf_acc.describe()
+# df_rf_acc.to_csv('/home/peng/git/Machine_learning_for_reliability_analysis/Test_1/Results/statistical_csv/gbt_prec_crazy10cv_100_4000.csv', header= True)
 
 
 
-#tt.plot_gridsearch(df_acc_rf_10cv, aspect = 3)
+
+
+df_rf_acc=pd.read_csv('/home/peng/git/Machine_learning_for_reliability_analysis/Test_1/Results/statistical_csv/gbt_prec_crazy10cv_100_4000.csv', header= 0)
+
+tt.plot_gridsearch(df_rf_acc, aspect = 3)
 
 
