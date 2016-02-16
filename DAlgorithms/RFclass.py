@@ -146,6 +146,8 @@ class training(object):
             
 
 
+
+#finaly find the 10-fold crossvalidation
     def trainmanCV(self, seed, train, trainlabel, tree_range, feature_range):
 
          

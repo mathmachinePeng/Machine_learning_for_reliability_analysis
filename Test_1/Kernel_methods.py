@@ -13,7 +13,7 @@ import Preprocessdata
 import MySVM as mysvc
 from sklearn.metrics.classification import accuracy_score, confusion_matrix, classification_report
 from scipy.interpolate import spline
-from bcolz.toplevel import arange
+
 from scipy import stats
 from sklearn.gaussian_process import GaussianProcess
 import timeit
@@ -28,13 +28,13 @@ from IPython.core.pylabtools import figsize
 
 def main():
     start = timeit.default_timer()
-    df =pd.read_csv('/home/peng/new160half.csv', header=0)
+    df =pd.read_csv('Source_Data.csv', header=0)
 #data=standardprocess()
     p= Preprocessdata.standardprocess()
 
     
 #    df_2 = pd.read_csv('/home/peng/git/Machine_learning_for_reliability_analysis/score50-500_2.csv', header=0)   
-    train, trainlabel, test, testlabel = p.scaledivd(df, 0.7)
+    train, trainlabel, test, testlabel = p.scaledivd(df, 1.0)
     #----------------------------------------------------- svcc=mysvc.training()
 #------------------------------------------------------------------------------ 
     #-------------- best, scores=svcc.svmsigmoid(train, trainlabel, -10, 10,100)
@@ -45,13 +45,14 @@ def main():
     #df_6s= pd.read_csv('/media/peng/Data/Project/CORROSION/DATA/alloy_600_data.csv', header=0)
   
     
-    svcc=mysvc.training()
-    best, scores=svcc.svmpoly(train, trainlabel, -10, 10,-10, 10, 40, plot=True)
+    svcc=mysvc.training_classify()
+    best, scores=svcc.svmrbf(train, trainlabel,  -10, 10, -10,10,21, plot=True)
+#    best, scores=svcc.svmpoly(train, trainlabel, -10, 10, 10, plot=True)
     print scores
 
 
-    score_test = DataFrame(scores)
-    score_test.to_csv('SVM_score_test_.csv')
+    #-------------------------------------------- score_test = DataFrame(scores)
+    #---------------------------------- score_test.to_csv('SVM_score_test_.csv')
     
     
     
