@@ -1,5 +1,5 @@
 '''
-Created on 15 Feb 2016
+Created on 18 Feb 2016
 
 @author: peng
 '''
@@ -54,11 +54,11 @@ gamma_range=np.logspace(-10, 10, num=21, base=2,endpoint= True)
 
 ff = mysvc.training_manCV()
 
-df = ff.trainSVC(train, trainlabel, 'poly', Cmin=-10, Cmax=10, numC=21, rmin=-10, rmax=10, numr=21, degree = 2)
+df = ff.trainSVC(train, trainlabel, 'poly', Cmin=-10, Cmax=10, numC=21, rmin=-10, rmax=10, numr=21, degree = 4)
 #------------------------------------------------------------------------------ 
 #------------------------------------------------------------- print df, df_this
 #------------------------------------------------------------------------------ 
-df.to_csv('/home/peng/git/Machine_learning_for_reliability_analysis/Test_1/Results/poly_cm_10CV_d2_n10_p10_21.csv', header = True)
+df.to_csv('/home/peng/git/Machine_learning_for_reliability_analysis/Test_1/Results/poly_cm_10CV_d4_n10_p10_21.csv', header = True)
 # df_this.to_csv('/home/peng/git/Machine_learning_for_reliability_analysis/Test_1/Results/Try_this_score.csv', header = True)
 
 
@@ -137,7 +137,3 @@ df.to_csv('/home/peng/git/Machine_learning_for_reliability_analysis/Test_1/Resul
 
 stop = timeit.default_timer()
 print "The running takes %r min" %((stop-start)/60)
-
-    
-
-    

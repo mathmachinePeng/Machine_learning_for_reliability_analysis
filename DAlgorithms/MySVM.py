@@ -84,31 +84,32 @@ class training_manCV():
         C_range=np.logspace(Cmin, Cmax, num=numC, base=2,endpoint= True)
         gamma_range=np.logspace(rmin, rmax, num=numr, base=2,endpoint= True)
         
-        svc = SVC(kernel='rbf')
-        mean_score=[]
+        svc = SVC(kernel=seed)
+#        mean_score=[]
         df_C_gamma= DataFrame({'gamma_range':gamma_range})
-        df_this = DataFrame({'gamma_range':gamma_range})
-         
+#        df_this = DataFrame({'gamma_range':gamma_range})
+        count = 0 
         for C in C_range:    
             score_C=[]    
-            score_C_this = []
-            
+#            score_C_this = []
+            count=count+1
             for gamma in gamma_range:
                 
-                         
+                training_manCV.secret_cm=[]         
                 svc.C = C
                 svc.gamma = gamma
+                svc.degree = degree
                 this_scores = cross_val_score(svc, train, trainlabel, scoring=training_manCV().metric_scores, cv=10, n_jobs=1)
                 
        
 
                 df_raw0 = DataFrame({'cm':training_manCV.secret_cm})
                
-                #print secret_cm
+                
                 score_C.append(np.mean(df_raw0['cm'].tail(10)))
 
                #score_C_this.append(np.mean(this_scores))
-            
+            print "%r cycle finished, %r left" %(count, numC-count)
             df_C_gamma[C]= score_C
             #df_this[C] = score_C_this 
         
