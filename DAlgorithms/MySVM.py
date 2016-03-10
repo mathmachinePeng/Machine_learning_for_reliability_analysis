@@ -16,6 +16,7 @@ from sklearn.svm import SVR
 from sklearn import metrics
 import re
 from sklearn.cross_validation import cross_val_score
+from evolutionary_search import EvolutionaryAlgorithmSearchCV
 
 
 
@@ -38,6 +39,7 @@ class training_manCV():
     def __init__(self):
         
         self.secret_cm=[]
+        self.secret_score=[]
         
  
     def metric_scores(self, estimator, testt, testlabelt):
@@ -48,6 +50,7 @@ class training_manCV():
         training_manCV.secret_cm.append( metrics.confusion_matrix(testlabelt, y_pred).flatten())
         
         #print training_manCV.secret_cm
+        training_manCV.secret_score.append( accuracy_score(testlabelt, y_pred))
         return accuracy_score(testlabelt, y_pred) 
    
     
@@ -78,6 +81,35 @@ class training_manCV():
         return pd.DataFrame({'tn':tn, 'fp':fp, 'fn':fn, 'tp':tp})
     
     
+    def train_gene(self, train, trainlabel, seed, Cmin, Cmax, numC, rmin, rmax, numr, degree=3):
+        
+        C_range=np.logspace(Cmin, Cmax, num=numC, base=2,endpoint= True)
+        gamma_range=np.logspace(rmin, rmax, num=numr, base=2,endpoint= True)
+        
+        
+        paramgrid = {"kernel":[seed],
+            "C":C_range,
+            "gamma":gamma_range,
+            "degree":[3]            
+            }
+        training_manCV.secret_score=[]
+        ev = EvolutionaryAlgorithmSearchCV(estimator=SVC(),
+                                   params=paramgrid,
+                                   scoring=training_manCV().metric_scores,
+                                   cv=10,
+                                   verbose=True,
+                                   population_size=50,
+                                   gene_mutation_prob=0.10,
+                                   tournament_size=10,
+                                   generations_number=100)
+        ev.fit(train, trainlabel)
+        
+        print training_manCV.secret_cm
+        print np.shape(training_manCV.secret_cm)
+        print training_manCV.secret_score
+        print np.shape(training_manCV.secret_score) 
+        print ev.best_score_, ev.best_params_                
+    
     
     
     def trainSVC (self, train, trainlabel, seed, Cmin, Cmax, numC, rmin, rmax, numr, degree=3):
@@ -95,7 +127,8 @@ class training_manCV():
             count=count+1
             for gamma in gamma_range:
                 
-                training_manCV.secret_cm=[]         
+                training_manCV.secret_cm=[]     
+                training_manCV.secret_score=[]      
                 svc.C = C
                 svc.gamma = gamma
                 svc.degree = degree
@@ -109,6 +142,7 @@ class training_manCV():
                 score_C.append(np.mean(df_raw0['cm'].tail(10)))
 
                #score_C_this.append(np.mean(this_scores))
+            print np.mean(this_scores) 
             print "%r cycle finished, %r left" %(count, numC-count)
             df_C_gamma[C]= score_C
             #df_this[C] = score_C_this 
