@@ -64,9 +64,9 @@ train = newtrain
 
 ff = mysvc.training_manCV()
 
-df = ff.trainSVC(train, trainlabel, 'poly', Cmin=-10, Cmax=10, numC=21, rmin=-10, rmax=10, numr=21, degree = 3)
+df = ff.trainSVC(train, trainlabel, 'poly', Cmin=-10, Cmax=10, numC=21, rmin=-10, rmax=10, numr=21, degree = 4)
 
-df.to_csv('/home/peng/git/Machine_learning_for_reliability_analysis/Test_1/Results/poly_pca6_cm_10CV_d3_n10_p10_21.csv', header = True)
+df.to_csv('/home/peng/git/Machine_learning_for_reliability_analysis/Test_1/Results/poly_pca6_cm_10CV_d4_n10_p10_21.csv', header = True)
 
 
 

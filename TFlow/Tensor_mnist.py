@@ -26,6 +26,8 @@ cross_entropy = -tf.reduce_sum(y_*tf.log(y))
 
 train_step = tf.train.GradientDescentOptimizer(0.01).minimize(cross_entropy)
 
+tf.add
+
 #initialize all the variables
 
 init = tf.initialize_all_variables()
