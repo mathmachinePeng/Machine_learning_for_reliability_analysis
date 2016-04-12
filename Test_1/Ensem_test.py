@@ -16,7 +16,7 @@ from sklearn.metrics.classification import accuracy_score, confusion_matrix, cla
 from sklearn.grid_search import GridSearchCV
 import matplotlib as mpl
 from scipy.interpolate import spline
-from bcolz.toplevel import arange
+
 import timeit
 #import seaborn as sns
 from matplotlib.ticker import MultipleLocator, FormatStrFormatter
@@ -26,7 +26,7 @@ import Superplot
 
 #------------------------------------------------ start = timeit.default_timer()
 #------------------------------------------------------------------------------ 
-# df =pd.read_csv('/home/peng/git/Machine_learning_for_reliability_analysis/Test_1/Results/adb_100_4000_10times.csv', header = 0)
+df =pd.read_csv('Source_Data.csv', header=0)
 #------------------------------------------------------------------------------ 
 #----------------------------------------------------- fig, ax1 = plt.subplots()
 #------------------------------------------------------------------------------ 
@@ -56,24 +56,27 @@ import Superplot
 ff = RFclass.training()
 tt = RFclass.test()
 pp = Superplot.fancy()
-#---------------------------------------------------------------- figsize(9.5,7)
-#------------------------------------------------------------------------------ 
-# df1 = pd.read_csv('//home/peng/git/Machine_learning_for_reliability_analysis/Test_1/Results/statistical_csv/bag_acc_10cv_100_4000.csv', header=0)
-# df2 = pd.read_csv('//home/peng/git/Machine_learning_for_reliability_analysis/Test_1/Results/statistical_csv/bag_prec_10cv_100_4000.csv', header=0)
-#---------------------- plt.plot(df1['tree_range'], df1['12'], label='Accuracy')
-#------------------- plt.plot(df1['tree_range'], df2['12'], label = 'Precision')
-#----------------------------------------------------- plt.legend(fontsize = 20)
-#------------------------------------------------------ plt.xticks(fontsize =20)
-#------------------------------------------------------ plt.yticks(fontsize =20)
-#--------------------------- plt.ylabel('Classification metrics', fontsize = 24)
-#---------------------------------- plt.xlabel('Number of trees', fontsize = 24)
-#-------------------------------------------------------------------- plt.show()
+figsize(9.5,7)
+
+df1 = pd.read_csv('//home/peng/git/Machine_learning_for_reliability_analysis/Test_1/Results/Ensemble/statistical_csv/bag_acc_10cv_100_4000.csv', header=0)
+df2 = pd.read_csv('//home/peng/git/Machine_learning_for_reliability_analysis/Test_1/Results/Ensemble/statistical_csv/bag_prec_10cv_100_4000.csv', header=0)
+print "This is the training set of field data."
+print "The size of the data is " 
+print df.describe()
+plt.plot(df1['tree_range'], df1['12'], label='Accuracy')
+plt.plot(df1['tree_range'], df2['12'], label = 'Precision')
+plt.legend(fontsize = 20)
+plt.xticks(fontsize =20)
+plt.yticks(fontsize =20)
+plt.ylabel('Classification metrics', fontsize = 24)
+plt.xlabel('Number of trees', fontsize = 24)
+plt.show()
 
 
 #########################plot grid for bagging and adaboosting ##########################
-# df1= pd.read_csv('/home/peng/git/Machine_learning_for_reliability_analysis/Test_1/Results/statistical_csv/adb_acc_10cv_100_4000.csv', header=0)
+# df1= pd.read_csv('/home/peng/git/Machine_learning_for_reliability_analysis/Test_1/Results/Ensemble/statistical_csv/adb_acc_10cv_100_4000.csv', header=0)
 #------------------------------------------------------------------------------ 
-# df2= pd.read_csv('/home/peng/git/Machine_learning_for_reliability_analysis/Test_1/Results/statistical_csv/adb_prec_10cv_100_4000.csv', header=0)
+# df2= pd.read_csv('/home/peng/git/Machine_learning_for_reliability_analysis/Test_1/Results/Ensemble/statistical_csv/adb_prec_10cv_100_4000.csv', header=0)
 #------------------------------------------------------------------------------ 
  # #df3= pd.read_csv('/home/peng/git/Machine_learning_for_reliability_analysis/Test_1/Results/statistical_csv/Sensitivity/bag_acc_63_f12_t1000_100times.csv', header=0)
 #------------------------------------------------------------------------------ 
@@ -170,8 +173,8 @@ pp = Superplot.fancy()
 
 
 
-df_rf_acc=pd.read_csv('/home/peng/git/Machine_learning_for_reliability_analysis/Test_1/Results/statistical_csv/gbt_prec_crazy10cv_100_4000.csv', header= 0)
-
-tt.plot_gridsearch(df_rf_acc, aspect = 3)
+# df_rf_acc=pd.read_csv('/home/peng/git/Machine_learning_for_reliability_analysis/Test_1/Results/statistical_csv/gbt_prec_crazy10cv_100_4000.csv', header= 0)
+#------------------------------------------------------------------------------ 
+#------------------------------------- tt.plot_gridsearch(df_rf_acc, aspect = 3)
 
 

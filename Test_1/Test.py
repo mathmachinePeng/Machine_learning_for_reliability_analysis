@@ -13,8 +13,9 @@ from sklearn.metrics.classification import accuracy_score, confusion_matrix, cla
 import TAmlp as mlp
 
 
-import TAdbn as dbn
-import TAsda as sda
-from scipy.interpolate import spline
-
+df=pd.DataFrame({'x':np.arange(0,10,1),'y':np.arange(0,10,1)})
+x=[]
+x.append(df.iloc[0:5].as_matrix())
+print x
+print x[0]
 

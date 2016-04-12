@@ -17,7 +17,7 @@ from sklearn import metrics
 import re
 from sklearn.cross_validation import cross_val_score
 from evolutionary_search import EvolutionaryAlgorithmSearchCV
-
+from sklearn.metrics import mean_absolute_error
 
 
 
@@ -428,59 +428,58 @@ class training_regress(object):
     def svmrbf(self, train, trainlabel, Cmin, Cmax, gmin, gmax, num, base=2, plot=False): #default crossvalidation 10-fold
             C_range=np.logspace(Cmin, Cmax, num=num, base=base)
             gamma_range=np.logspace(gmin,gmax,num=num,base=base)
+            ep_range =np.logspace(Cmin, Cmax, num=num, base=base)
             #cv = StratifiedShuffleSplit(trainlabel, n_iter=10, test_size=0.1, random_state=0)
-            param_grid = dict(gamma=gamma_range,C=C_range) 
+            param_grid = dict(gamma=gamma_range,C=C_range, epsilon=ep_range) 
             grid = GridSearchCV(SVR(), param_grid=param_grid, cv=10)
             grid.fit(train, trainlabel) 
             print("The best parameters are %s with a score of %0.2f"
                   % (grid.best_params_, grid.best_score_))  
-            scores = [x[1] for x in grid.grid_scores_]
-            scores = np.array(scores).reshape(len(C_range), len(gamma_range))        
-            scores = DataFrame(scores)
-            bestmodel= svm.SVR(kernel='rbf', gamma =grid.best_params_["gamma"], C= grid.best_params_["C"]).fit(train,trainlabel)
+           # scores = [x[1] for x in grid.grid_scores_]
+           # scores = np.array(scores).reshape(len(C_range), len(gamma_range))        
+           # scores = DataFrame(scores)
+            bestmodel= svm.SVR(kernel='rbf', gamma =grid.best_params_["gamma"], C= grid.best_params_["C"], epsilon= grid.best_params_["epsilon"]).fit(train,trainlabel)
             
-            if plot== True:
-                class MidpointNormalize(Normalize):
-                    def __init__(self, vmin=None, vmax=None, midpoint=None, clip=False):
-                        self.midpoint = midpoint
-                        Normalize.__init__(self, vmin, vmax, clip)
-                
-                    def __call__(self, value, clip=None):
-                        x, y = [self.vmin, self.midpoint, self.vmax], [0.4, 0.6, 0.82]
-                        return np.ma.masked_array(np.interp(value, x, y))
-    
-                fig, ax = plt.subplots(figsize=(8, 6))
-                #plt.figure(figsize=(8, 6))
-                
-                plt.subplots_adjust(left=.2, right=0.95, bottom=0.15, top=0.95)
-                
-                plt.imshow(scores, interpolation='nearest', cmap=plt.cm.hot,
-                           norm=MidpointNormalize())
-                plt.xlabel('gamma')
-                plt.ylabel('C')
-                plt.colorbar()
+            #--------------------------------------------------- if plot== True:
+                #--------------------------- class MidpointNormalize(Normalize):
+                    # def __init__(self, vmin=None, vmax=None, midpoint=None, clip=False):
+                        #------------------------------ self.midpoint = midpoint
+                        #------------ Normalize.__init__(self, vmin, vmax, clip)
+#------------------------------------------------------------------------------ 
+                    #--------------------- def __call__(self, value, clip=None):
+                        # x, y = [self.vmin, self.midpoint, self.vmax], [0.4, 0.6, 0.82]
+                        #----- return np.ma.masked_array(np.interp(value, x, y))
+#------------------------------------------------------------------------------ 
+                #------------------------ fig, ax = plt.subplots(figsize=(8, 6))
+                #----------------------------------- #plt.figure(figsize=(8, 6))
+#------------------------------------------------------------------------------ 
+                # plt.subplots_adjust(left=.2, right=0.95, bottom=0.15, top=0.95)
+#------------------------------------------------------------------------------ 
+                #-- plt.imshow(scores, interpolation='nearest', cmap=plt.cm.hot,
+                           #-------------------------- norm=MidpointNormalize())
+                #------------------------------------------- plt.xlabel('gamma')
+                #----------------------------------------------- plt.ylabel('C')
+                #------------------------------------------------ plt.colorbar()
                 
                
-                g_range=np.linspace(-10, 10, 11)
-                print g_range
-                
-                plt.xticks(np.arange(len(g_range)), g_range, rotation=45)#np.arrange sets the range of ticks
-                plt.yticks(np.arange(len(C_range)), C_range)
-                ax.xaxis.set_major_locator(MultipleLocator(1))
-                #ax.xaxix.set_major_formatter(FormatStrFormatter('%d'))           
-                plt.show()
-                return (bestmodel, scores)
-            
-            else:
+                #------------------------------ g_range=np.linspace(-10, 10, 11)
+                #------------------------------------------------- print g_range
+#------------------------------------------------------------------------------ 
+                # plt.xticks(np.arange(len(g_range)), g_range, rotation=45)#np.arrange sets the range of ticks
+                #------------------ plt.yticks(np.arange(len(C_range)), C_range)
+                #---------------- ax.xaxis.set_major_locator(MultipleLocator(1))
+                #------- #ax.xaxix.set_major_formatter(FormatStrFormatter('%d'))
+                #---------------------------------------------------- plt.show()
+
                         
-                return (bestmodel, scores)
+            return (bestmodel)
 
 class test(object):   
     def __init__(self):
         print "This is for test set**************************************"
                
       
-    def testsvm(self, test, testlabel,bestmodel):
+    def test_classification(self, test, testlabel,bestmodel):
 #        bestmodel=bestmodel
         outputtest = bestmodel.predict(test)
         accuracytest = accuracy_score(testlabel, outputtest)
@@ -492,5 +491,12 @@ class test(object):
 #        print probaout
         return outputtest
         
+    def test_regression(self, test, testlabel,bestmodel):
+        
+        outputtest = bestmodel.predict(test)
+ #       print outputtest
+        MAE = mean_absolute_error(testlabel, outputtest)
 
+        print "The MAE for the test set is %r" %MAE       
+        return outputtest
         
