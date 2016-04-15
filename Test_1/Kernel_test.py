@@ -35,27 +35,27 @@ from matplotlib.pyplot import xlim
 start = timeit.default_timer()
 
 ####### Read the source data######################
-df =pd.read_csv('Source_Data.csv', header=0)
-
-p= Preprocessdata.standardprocess()
-
-
-
-train, trainlabel, test, testlabel = p.scaledivd(df, 1.0)
-print (np.shape(train))
+#---------------------------------- df =pd.read_csv('Source_Data.csv', header=0)
+#------------------------------------------------------------------------------ 
+#------------------------------------------- p= Preprocessdata.standardprocess()
+#------------------------------------------------------------------------------ 
+#------------------------------------------------------------------------------ 
+#------------------------------------------------------------------------------ 
+#--------------------- train, trainlabel, test, testlabel = p.scaledivd(df, 1.0)
+#------------------------------------------------------- print (np.shape(train))
 
 ###################################### PCA  #############################
 
-from sklearn.decomposition import PCA
-
-pca = PCA(n_components=6)
-newtrain=pca.fit_transform(train)
-print (pca.explained_variance_ratio_ )
-print (np.sum(pca.explained_variance_ratio_))
-print (np.shape(newtrain))
-
-
-train = newtrain
+#----------------------------------------- from sklearn.decomposition import PCA
+#------------------------------------------------------------------------------ 
+#----------------------------------------------------- pca = PCA(n_components=6)
+#--------------------------------------------- newtrain=pca.fit_transform(train)
+#---------------------------------------- print (pca.explained_variance_ratio_ )
+#--------------------------------- print (np.sum(pca.explained_variance_ratio_))
+#---------------------------------------------------- print (np.shape(newtrain))
+#------------------------------------------------------------------------------ 
+#------------------------------------------------------------------------------ 
+#-------------------------------------------------------------- train = newtrain
 
 
 
@@ -63,11 +63,11 @@ train = newtrain
 
 ###############################################Train the model
 
-ff = mysvc.training_manCV()
+#ff = mysvc.training_manCV()
 
-df = ff.trainSVC(train, trainlabel, 'sigmoid', Cmin=-10, Cmax=10, numC=21, rmin=-10, rmax=10, numr=21, degree = 3)
+#df = ff.trainSVC(train, trainlabel, 'sigmoid', Cmin=-10, Cmax=10, numC=21, rmin=-10, rmax=10, numr=21, degree = 3)
 
-df.to_csv('/home/peng/git/Machine_learning_for_reliability_analysis/Test_1/Results/sigmoid_pca6_cm_10CV_n10_p10_21.csv', header = True)
+#df.to_csv('/home/peng/git/Machine_learning_for_reliability_analysis/Test_1/Results/sigmoid_pca6_cm_10CV_n10_p10_21.csv', header = True)
 
 
 
@@ -78,7 +78,7 @@ df.to_csv('/home/peng/git/Machine_learning_for_reliability_analysis/Test_1/Resul
 
 
 
-#df = pd.read_csv('/home/peng/git/Machine_learning_for_reliability_analysis/Test_1/Results/sigmoid_cm_10CV_n10_p10_21.csv', header = 0)
+#df = pd.read_csv('/home/peng/git/Machine_learning_for_reliability_analysis/Test_1/Results/poly_pca6_cm_10CV_d3_n10_p10_21.csv', header = 0)
  
  
 #### transform the raw data into accuracy or precision
@@ -88,9 +88,10 @@ df.to_csv('/home/peng/git/Machine_learning_for_reliability_analysis/Test_1/Resul
 #------------------------------------------------------------------------------ 
 #---------------------------------------------------- df_assess = pd.DataFrame()
 #-------------------------------------------------- for i in df2.columns.values:
-    #-------------------------- df_assess[i]= ff.accuracy( ff.str_float(df2[i]))
+    #------------------------- #df_assess[i]= ff.accuracy( ff.str_float(df2[i]))
+    #------------------------- df_assess[i]= ff.precision( ff.str_float(df2[i]))
 #------------------------------------------------------------------------------ 
-# df_assess.to_csv('/home/peng/git/Machine_learning_for_reliability_analysis/Test_1/Results/sigmoid_acc_10CV_n10_p10_21.csv', header = True)
+# df_assess.to_csv('/home/peng/git/Machine_learning_for_reliability_analysis/Test_1/Results/poly_pca6_prec_10CV_d3_n10_p10_21.csv', header = True)
 
 #####        
 
@@ -179,9 +180,11 @@ df.to_csv('/home/peng/git/Machine_learning_for_reliability_analysis/Test_1/Resul
 #===============================================================================
 
 
-####################################
+#################################### read the acc or prec to find the statistics of it ###############
 
+df = pd.read_csv('/home/peng/git/Machine_learning_for_reliability_analysis/Test_1/Results/kernel/poly_acc_d1_10CV_n10_p10_21.csv', header = 0)
 
+print df.describe()
 
 
 
