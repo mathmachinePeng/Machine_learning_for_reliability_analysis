@@ -16,7 +16,7 @@ from sklearn.svm import SVR
 from sklearn import metrics
 import re
 from sklearn.cross_validation import cross_val_score
-from evolutionary_search import EvolutionaryAlgorithmSearchCV
+#from evolutionary_search import EvolutionaryAlgorithmSearchCV
 from sklearn.metrics import mean_absolute_error
 
 
@@ -104,11 +104,13 @@ class training_manCV():
                                    generations_number=100)
         ev.fit(train, trainlabel)
         
-        print training_manCV.secret_cm
-        print np.shape(training_manCV.secret_cm)
-        print training_manCV.secret_score
-        print np.shape(training_manCV.secret_score) 
-        print ev.best_score_, ev.best_params_                
+        #=======================================================================
+        # print training_manCV.secret_cm
+        # print np.shape(training_manCV.secret_cm)
+        # print training_manCV.secret_score
+        # print np.shape(training_manCV.secret_score) 
+        # print ev.best_score_, ev.best_params_                
+        #=======================================================================
     
     
     
@@ -142,8 +144,8 @@ class training_manCV():
                 score_C.append(np.mean(df_raw0['cm'].tail(10)))
 
                #score_C_this.append(np.mean(this_scores))
-            print np.mean(this_scores) 
-            print "%r cycle finished, %r left" %(count, numC-count)
+            print (np.mean(this_scores) )
+            print ("%r cycle finished, %r left" %(count, numC-count))
             df_C_gamma[C]= score_C
             #df_this[C] = score_C_this 
         
@@ -185,7 +187,7 @@ class training_manCV():
 
 class training_classify(object):
     def __init__(self):
-        print "This is for training set**************************************"
+        print ("This is for training set**************************************")
         
         
     def trainSVC(self, train, trainlabel, seed, Cmin, Cmax, num, plot=False):
@@ -408,7 +410,7 @@ class training_classify(object):
 
 class training_regress(object):
     def __init__(self):
-        print "This is for training set**************************************"
+        print ("This is for training set**************************************")
         
     def svmlinear(self, train, trainlabel, Cmin, Cmax, num, base=2): #default crossvalidation 10-fold
         C_range=np.logspace(Cmin, Cmax, num=num, base=base)
@@ -476,16 +478,16 @@ class training_regress(object):
 
 class test(object):   
     def __init__(self):
-        print "This is for test set**************************************"
+        print ("This is for test set**************************************")
                
       
     def test_classification(self, test, testlabel,bestmodel):
 #        bestmodel=bestmodel
         outputtest = bestmodel.predict(test)
         accuracytest = accuracy_score(testlabel, outputtest)
-        print "The accuracy for the test set is %r" %accuracytest, "and the confusion matrix is"
-        print confusion_matrix(outputtest,testlabel)
-        print classification_report(testlabel, outputtest)
+        print ("The accuracy for the test set is %r" %accuracytest, "and the confusion matrix is")
+        print (confusion_matrix(outputtest,testlabel))
+        print( classification_report(testlabel, outputtest))
 #        probaout=bestmodel.predict_prob(test)
 #       probaout= DataFrame(probaout)
 #        print probaout
@@ -497,6 +499,6 @@ class test(object):
  #       print outputtest
         MAE = mean_absolute_error(testlabel, outputtest)
 
-        print "The MAE for the test set is %r" %MAE       
+        print ("The MAE for the test set is %r" %MAE  )     
         return outputtest
         

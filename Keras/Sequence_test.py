@@ -3,6 +3,7 @@ Created on 23 Mar 2016
 
 @author: peng
 '''
+
 #------------------------------------------- from keras.models import Sequential
 #------------------------------- from keras.layers.core import Dense, Activation
 #--------------------------------------- from keras.layers.recurrent import LSTM
@@ -119,8 +120,8 @@ from random import random
 #------------------------------------ pdata = pd.DataFrame({"a":flow, "b":flow})
 #---------------------------------------------------- pdata.b = pdata.b.shift(9)
 #------------------------------- data = pdata.iloc[10:] * random()  # some noise
-#------------------------------------------------------------------------------ 
-#-------------------------------------- data.to_csv('raw_data.csv', header=True)
+
+#data.to_csv('raw_data_for_test.csv', header=True)
 
 ########check the raw_data and plot it ####
 
@@ -165,10 +166,11 @@ def train_test_split(df, test_size=0.1):
 
     return (X_train, y_train), (X_test, y_test)
 
-(X_train, y_train), (X_test, y_test) = train_test_split(data.iloc[0:2000])  # retrieve data
 
-print np.shape(X_train)[0]
-print np.shape(y_test)[0]
+(X_train, y_train), (X_test, y_test) = train_test_split(data.iloc[0:20000])  # retrieve data
+
+#print np.shape(X_train)[0]
+#print np.shape(y_test)[0]
 
 ##################################################################################################
 
@@ -193,7 +195,7 @@ model.fit(X_train, y_train, batch_size=np.shape(X_train)[0], nb_epoch=2, validat
 
 predicted = model.predict(X_test,batch_size=np.shape(y_test)[0])
 rmse = np.sqrt(((predicted - y_test) ** 2).mean(axis=0))
-print rmse
+#print rmse
 ##################################
 # and maybe plot it
 
