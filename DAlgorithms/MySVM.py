@@ -134,7 +134,7 @@ class training_manCV():
                 svc.C = C
                 svc.gamma = gamma
                 svc.degree = degree
-                this_scores = cross_val_score(svc, train, trainlabel, scoring=training_manCV().metric_scores, cv=10, n_jobs=1)
+                this_scores = cross_val_score(svc, train, trainlabel, scoring=training_manCV().metric_scores, cv=10, n_jobs=-1)
                 
        
 

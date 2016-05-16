@@ -20,7 +20,7 @@ from sklearn.ensemble.partial_dependence import partial_dependence
 from mpl_toolkits.mplot3d import Axes3D
 from sklearn.grid_search import GridSearchCV
 from sklearn import metrics
-from sklearn.metrics import recall_score, precision_score, r2_score
+from sklearn.metrics import recall_score, precision_score, r2_score, mean_squared_error
 from sklearn.metrics.scorer import make_scorer
 import re
 from IPython.core.pylabtools import figsize
@@ -44,12 +44,34 @@ class training(object):
         forest=rawforest.fit(train,trainlabel)
         outputtrain= forest.predict(train)
         print r2_score(trainlabel, outputtrain) 
+        print mean_squared_error(trainlabel, outputtrain)
 #        accuracytrain = accuracy_score(trainlabel, outputtrain)        
 #        print "The size of the training set is %r , %r" %(np.shape(train)[0],np.shape(train)[1])
         #---------------------------------------- print "The method is %r" %seed
         # print "The accuracy for the training set is %r" %accuracytrain, "and the confusion matrix is"
         #------------------------ print confusion_matrix(outputtrain,trainlabel)
         return (forest)
+    
+    def trainforest_regress(self, seed, train, trainlabel, number_trees, number_features):
+        seed_of_tree = {'rf': RandomForestClassifier(n_estimators= number_trees, max_features=number_features), 
+                      'adb': AdaBoostClassifier(n_estimators= number_trees),
+                      'bag': BaggingClassifier(n_estimators= number_trees),
+                      'ext': ExtraTreesClassifier(n_estimators= number_trees, max_features=number_features),
+                      'gbt': GradientBoostingClassifier(n_estimators= number_trees, max_features=number_features),
+                      'bagging': RandomForestClassifier(n_estimators= number_trees, max_features=12),
+                      'cart': DecisionTreeClassifier(criterion='entropy'),
+                      'rf_regress': RandomForestRegressor(n_estimators= number_trees, max_features=number_features)}
+        rawforest=seed_of_tree[seed]
+        forest=rawforest.fit(train,trainlabel)
+        outputtrain= forest.predict(train)
+        print r2_score(trainlabel, outputtrain) 
+#        accuracytrain = accuracy_score(trainlabel, outputtrain)        
+#        print "The size of the training set is %r , %r" %(np.shape(train)[0],np.shape(train)[1])
+        #---------------------------------------- print "The method is %r" %seed
+        # print "The accuracy for the training set is %r" %accuracytrain, "and the confusion matrix is"
+        #------------------------ print confusion_matrix(outputtrain,trainlabel)
+        return (forest)
+    
     
     def train_repeat_forest(self, seed, train, trainlabel, test, testlabel, number_trees, number_features, repeat_times):
         seed_of_tree = {'rf': RandomForestClassifier(n_estimators= number_trees, max_features=number_features), 
@@ -383,8 +405,8 @@ class test():
     
     def testforest_R(self, test, testlabel, forest):
         outputtest= forest.predict(test) 
-        return r2_score(testlabel, outputtest)
-                  
+        return r2_score(testlabel, outputtest),mean_squared_error(testlabel, outputtest)
+                   
     
     
     def testforest_confu(self, test, testlabel,forest):

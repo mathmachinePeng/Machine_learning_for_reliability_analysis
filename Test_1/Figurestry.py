@@ -12,14 +12,14 @@ import RFclass
 import Preprocessdata 
 #import Preprocessdata1 as p
 import MySVM as mysvc
-import TAlogistic as tl
-import cPickle, theano
+#import TAlogistic as tl
+#import cPickle, theano
 from sklearn.metrics.classification import accuracy_score, confusion_matrix, classification_report
-import TAmlp as mlp
+#import TAmlp as mlp
 
 
-import TAdbn as dbn
-import TAsda as sda
+#import TAdbn as dbn
+#import TAsda as sda
 from scipy.interpolate import spline
 import seaborn as sns
 from IPython.core.pylabtools import figsize
@@ -41,29 +41,64 @@ from IPython.core.pylabtools import figsize
              #------------------------------------------------------ bottom=ext)
 #------------------------------------------------------------------------------ 
 
+
+################################Plot bar chart for ensemble methods
+#===============================================================================
+# N = 5
+# 
+# 
+# ind = np.arange(N)  # the x locations for the groups
+# width = 0.2       # the width of the bars
+# acc = (0.69,  0.75, 0.75, 0.69,0.75)
+# 
+# fig, ax = plt.subplots(figsize = (8,6.5))
+# rects1 = ax.bar(ind, acc, width,color='c')
+# 
+# prec = (0.80,  0.83, 0.83, 0.71,0.83)
+# rects2 = ax.bar(ind + width, prec, width)
+# #add some text for labels, title and axes ticks
+# ax.set_xlabel('Classification metrics', fontsize=24)
+# #ax.set_title('Ensemble methods')
+# ax.set_xticks(ind + width)
+# ax.set_xticklabels(('Bagging',  'RF', 'ERT', 'AdaBoosting','GTB'))
+# plt.ylim(0.5,1)
+# plt.yticks(fontsize = 14)
+# plt.xticks(fontsize = 14)
+# plt.ylabel('Scores', fontsize=24)
+# 
+# ax.legend((rects1[0], rects2[0]), ('Accuracy', 'Precision'),fontsize=20)
+#===============================================================================
+###############################################################################
+
+#########################################plot chart for kernel methods################
+
 N = 5
 
 
 ind = np.arange(N)  # the x locations for the groups
 width = 0.2       # the width of the bars
-acc = (0.69,  0.75, 0.75, 0.69,0.75)
+acc = (0.77,  0.79, 0.77, 0.78,0.79)
 
 fig, ax = plt.subplots(figsize = (8,6.5))
-rects1 = ax.bar(ind, acc, width,color='c')
-
-prec = (0.80,  0.83, 0.83, 0.71,0.83)
-rects2 = ax.bar(ind + width, prec, width)
+#rects1 = ax.bar(ind, acc, width,color='#00BFFF')
+rects1 = ax.bar(ind, acc, width,color='#54D2CC')
+prec = (0.79,  0.82, 0.79, 0.74,0.78)
+rects2 = ax.bar(ind + width, prec, width,color='#B2DD60')
 #add some text for labels, title and axes ticks
-ax.set_xlabel('Classification metrics', fontsize=24)
+ax.set_xlabel('Kernel methods', fontsize=24)
 #ax.set_title('Ensemble methods')
 ax.set_xticks(ind + width)
-ax.set_xticklabels(('Bagging',  'RF', 'ERT', 'AdaBoosting','GTB'))
-plt.ylim(0.5,1)
+ax.set_xticklabels(('Sigmoid',  'RBF', 'Poly(d=1)', 'Poly(d=2)','Poly(d=3)'))
+plt.ylim(0.7,0.9)
 plt.yticks(fontsize = 14)
 plt.xticks(fontsize = 14)
 plt.ylabel('Scores', fontsize=24)
 
 ax.legend((rects1[0], rects2[0]), ('Accuracy', 'Precision'),fontsize=20)
+
+#################################################################################
+
+
 
 
 #===============================================================================
@@ -111,7 +146,7 @@ plt.show()
 
 
 
-
+color_web = 'http://matplotlib.org/examples/color/named_colors.html'
 
 
 cnames = {
