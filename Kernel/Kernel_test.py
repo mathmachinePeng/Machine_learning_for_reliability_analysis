@@ -20,7 +20,7 @@ from scipy import stats
 from sklearn.gaussian_process import GaussianProcess
 import timeit
 from mpl_toolkits.mplot3d import Axes3D
-import seaborn as sns
+#import seaborn as sns
 from IPython.core.pylabtools import figsize
 from scipy.interpolate import spline
 from sklearn.svm import SVC
