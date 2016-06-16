@@ -1,115 +1,164 @@
-'''
-Created on 6 Jun 2016
+#!/usr/bin/env python
 
-@author: peng
-'''
+#  Author: Angela Chapman
+#  Date: 8/6/2014
+#
+#  This file contains code to accompany the Kaggle tutorial
+#  "Deep learning goes to the movies".  The code in this file
+#  is for Part 2 of the tutorial and covers Bag of Centroids
+#  for a Word2Vec model. This code assumes that you have already
+#  run Word2Vec and saved a model called "300features_40minwords_10context"
+#
+# *************************************** #
+
+
+# Load a pre-trained model
+from gensim.models import Word2Vec
+from sklearn.cluster import KMeans
+import time
 import pandas as pd
+from sklearn.ensemble import RandomForestClassifier
+from bs4 import BeautifulSoup
+import re
+from nltk.corpus import stopwords
+import numpy as np
+import os
 import Preprocessing_nlp as pre
-#from NLP.Kaggle_IMDB.Preprocessing_nlp import review_to_words
-
-###  1. import the data###
-
-data_path = '/home/peng/Documents/NLP/Kaggle_datasets/'
-
-train = pd.read_csv(data_path + 'labeledTrainData.tsv', header = 0, \
-                    delimiter = '\t', quoting = 3)
-
-'''
-Here, "header=0" indicates that the first line of the file contains column names, 
-"delimiter=\t" indicates that the fields are separated by tabs, and quoting=3 tells 
-Python to ignore doubled quotes, otherwise you may encounter errors trying to read the file.
-'''
-#print train.shape
-#print train.columns.values
-##print train['review'][0]
-###############################
-
-#------------------------------------------------------------------------------ 
-#--- #### Noted, Section 2 has been organized into a methdo in Preprocessing_nlp
-#------------------------------------------------------------------------------ 
-#----------------------------------- ### 2. Data cleaning and Text preprocessing
-#------------------------------------------------------------------------------ 
-#----------------------- ### 2.1 Removing HTML Markup: The BeautifulSoup Package
-#------------------------------------------------- from bs4 import BeautifulSoup
-#---------------- # Initialize the BeautifulSoup object on a single movie review
-#---------------------------------- example1 = BeautifulSoup(train['review'][0])
-#------------------------------------------------------------------------------ 
-#----------------------------------------------------- #print train["review"][1]
-#---------------------------------------------------- #print example1.get_text()
-#------------------------------------------------------------------------------ 
-# ### 2.2 Dealing with Punctuation, Numbers and Stopwords: NLTK and regular expressions
-#------------------------------------------------------------------------------ 
-#--------------------------------------------------------------------- import re
-#---------------------------- # Use regular expressions to do a find-and-replace
-#------ letters_only = re.sub("[^a-zA-Z]",           # The pattern to search for
-                      #- " ",                   # The pattern to replace it with
-                      #------------- example1.get_text() )  # The text to search
-#--------------------------------------------------------------------------- '''
- # [] indicates group membership and ^ means "not".  In other words, the re.sub() statement above
-  # says, "Find anything that is NOT a lowercase letter (a-z) or an upper case letter (A-Z), and
-  #--------------------------------------------------- replace it with a space."
-#--------------------------------------------------------------------------- '''
-#----------------------------------------------------------- #print letters_only
-#------------------------------------------------------------------------------ 
-#------------------------------------------------------------------------------ 
-#------------------------------------------------------------------------ ######
-#------------------------------------------------------------------------------ 
-#--------- ### 2.3 Tokenization: convert samples into single lower case words###
-#------------------------------------------------------------------------------ 
-#-------------- lower_case = letters_only.lower()        # Convert to lower case
-#------------------- words = lower_case.split()               # Split into words
-#------------------------------------------------------------------------------ 
-#------------------------------------------------- ### 2.4 remove the stop words
-#------------------------------------------------------------------- import nltk
-#--------------------------------------------- from nltk.corpus import stopwords
-#---------------------------------------------- print stopwords.words('english')
-#------------------------------------------------------------------------------ 
-#------------- words = [w for w in words if not w in stopwords.words("english")]
-#------------------------------------------------------------------- print words
-###########################################################################
-
-#------------------- ### using method to realize the function of above section 2
-#------------------------ clean_review = pre.review_to_words(train['review'][0])
-#------------------------------------------------------------ print clean_review
 
 
-### loop and clean all the training set at once
-num_reviews = train['review'].size
-clean_train_reviews = []
+# Define a function to create bags of centroids
+#
+def create_bag_of_centroids( wordlist, word_centroid_map ):
+    #
+    # The number of clusters is equal to the highest cluster index
+    # in the word / centroid map
+    num_centroids = max( word_centroid_map.values() ) + 1
+    #
+    # Pre-allocate the bag of centroids vector (for speed)
+    bag_of_centroids = np.zeros( num_centroids, dtype="float32" )
+    #
+    # Loop over the words in the review. If the word is in the vocabulary,
+    # find which cluster it belongs to, and increment that cluster count
+    # by one
+    for word in wordlist:
+        if word in word_centroid_map:
+            index = word_centroid_map[word]
+            bag_of_centroids[index] += 1
+    #
+    # Return the "bag of centroids"
+    return bag_of_centroids
 
-for i in xrange(0, num_reviews):
+
+if __name__ == '__main__':
     
-    if ((i+1)%1000 == 0):
-        print "review %d of %d\n" % (i+1, num_reviews)
-    
-    clean_train_reviews.append(pre.review_to_words(train['review'][i]))
-    
-##### 3. Creating features from a Bag of Words
-'''
- The Bag of Words model learns a vocabulary from all of the documents, then models each 
- document by counting the number of times each word appears.
-'''
+    data_path = '/home/peng/Documents/NLP/Kaggle_datasets/'
 
-print "Creating the bag of words...\n"
-from sklearn.feature_extraction.text import CountVectorizer
-# 3.1 fit the countvectorizer model with training set
-# Initialize the "CountVectorizer" object, which is scikit-learn's
-# bag of words tool.  
-vectorizer = CountVectorizer(analyzer = "word",   \
-                             tokenizer = None,    \
-                             preprocessor = None, \
-                             stop_words = None,   \
-                             max_features = 5000) 
+    model = Word2Vec.load(data_path + "300features_40minwords_10context")
 
-# fit_transform() does two functions: First, it fits the model
-# and learns the vocabulary; second, it transforms our training data
-# into feature vectors. The input to fit_transform should be a list of 
-# strings.
-train_data_features = vectorizer.fit_transform(clean_train_reviews)
 
-# Numpy arrays are easy to work with, so convert the result to an 
-# array
-train_data_features = train_data_features.toarray()
+    # ****** Run k-means on the word vectors and print a few clusters
+    #
+
+    start = time.time() # Start time
+
+    # Set "k" (num_clusters) to be 1/5th of the vocabulary size, or an
+    # average of 5 words per cluster
+    word_vectors = model.syn0
+    num_clusters = word_vectors.shape[0] / 5
+
+    # Initalize a k-means object and use it to extract centroids
+    print "Running K means"
+    kmeans_clustering = KMeans( n_clusters = num_clusters )
+    idx = kmeans_clustering.fit_predict( word_vectors )
+
+    # Get the end time and print how long the process took
+    end = time.time()
+    elapsed = end - start
+    print "Time taken for K Means clustering: ", elapsed, "seconds."
+
+
+    # Create a Word / Index dictionary, mapping each vocabulary word to
+    # a cluster number
+    word_centroid_map = dict(zip( model.index2word, idx ))
+
+    # Print the first ten clusters
+    for cluster in xrange(0,10):
+        #
+        # Print the cluster number
+        print "\nCluster %d" % cluster
+        #
+        # Find all of the words for that cluster number, and print them out
+        words = []
+        for i in xrange(0,len(word_centroid_map.values())):
+            if( word_centroid_map.values()[i] == cluster ):
+                words.append(word_centroid_map.keys()[i])
+        print words
+
+
+
+
+    # Create clean_train_reviews and clean_test_reviews as we did before
+    #
+
+    # Read data from files
+    train = pd.read_csv(data_path + 'labeledTrainData.tsv', header = 0, \
+                        delimiter = '\t', quoting = 3)
+    test = pd.read_csv(data_path + 'testData.tsv', header = 0, \
+                        delimiter = '\t', quoting = 3)
+    unlabeled_train = pd.read_csv(data_path + 'unlabeledTrainData.tsv', header = 0, \
+                        delimiter = '\t', quoting = 3)
+
+
+    print "Cleaning training reviews"
+    clean_train_reviews = []
+    for review in train["review"]:
+        clean_train_reviews.append( pre.review_to_wordlist( review, \
+            remove_stopwords=True ))
+
+    print "Cleaning test reviews"
+    clean_test_reviews = []
+    for review in test["review"]:
+        clean_test_reviews.append( pre.review_to_wordlist( review, \
+            remove_stopwords=True ))
+
+
+    # ****** Create bags of centroids
+    #
+    # Pre-allocate an array for the training set bags of centroids (for speed)
+    train_centroids = np.zeros( (train["review"].size, num_clusters), \
+        dtype="float32" )
+
+    # Transform the training set reviews into bags of centroids
+    counter = 0
+    for review in clean_train_reviews:
+        train_centroids[counter] = create_bag_of_centroids( review, \
+            word_centroid_map )
+        counter += 1
+
+    # Repeat for test reviews
+    test_centroids = np.zeros(( test["review"].size, num_clusters), \
+        dtype="float32" )
+
+    counter = 0
+    for review in clean_test_reviews:
+        test_centroids[counter] = create_bag_of_centroids( review, \
+            word_centroid_map )
+        counter += 1
+
+
+    # ****** Fit a random forest and extract predictions
+    #
+    forest = RandomForestClassifier(n_estimators = 100)
+
+    # Fitting the forest may take a few minutes
+    print "Fitting a random forest to labeled training data..."
+    forest = forest.fit(train_centroids,train["sentiment"])
+    result = forest.predict(test_centroids)
+
+    # Write the test results
+    output = pd.DataFrame(data={"id":test["id"], "sentiment":result})
+    output.to_csv(data_path + "BagOfCentroids.csv", index=False, quoting=3)
+    print "Wrote BagOfCentroids.csv"
 
 
 

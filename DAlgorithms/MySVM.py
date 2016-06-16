@@ -112,6 +112,38 @@ class training_manCV():
         # print ev.best_score_, ev.best_params_                
         #=======================================================================
     
+
+    def trainauc (self, train, trainlabel, seed, Cmin, Cmax, numC, rmin, rmax, numr, degree=3):
+        C_range=np.logspace(Cmin, Cmax, num=numC, base=2,endpoint= True)
+        gamma_range=np.logspace(rmin, rmax, num=numr, base=2,endpoint= True)
+        
+        svc = SVC(kernel=seed)
+#        mean_score=[]
+        df_C_gamma= DataFrame({'gamma_range':gamma_range})
+#        df_this = DataFrame({'gamma_range':gamma_range})
+        count = 0 
+        for C in C_range:    
+            score_C=[]    
+#            score_C_this = []
+            count=count+1
+            for gamma in gamma_range:                   
+     
+                svc.C = C
+                svc.gamma = gamma
+                svc.degree = degree
+                this_scores = cross_val_score(svc, train, trainlabel, scoring='roc_auc', cv=10, n_jobs=-1)
+                
+                score_C.append(np.mean(this_scores))                                      
+
+               #score_C_this.append(np.mean(this_scores))
+            print (np.mean(score_C) )
+            print ("%r cycle finished, %r left" %(count, numC-count))
+            df_C_gamma[C]= score_C
+            #df_this[C] = score_C_this        
+        
+        return df_C_gamma 
+
+
     
     
     def trainSVC (self, train, trainlabel, seed, Cmin, Cmax, numC, rmin, rmax, numr, degree=3):
