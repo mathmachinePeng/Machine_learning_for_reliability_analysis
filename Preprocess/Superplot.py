@@ -67,8 +67,8 @@ class fancy():
     
         plt.xticks(np.arange(2), ['Unfailed','Failed'], fontsize=20)
         plt.yticks(np.arange(2), ['Unfailed','Failed'], fontsize=20, rotation=90)
-        plt.xlabel('Predicted class', fontsize=24)
-        plt.ylabel('True class', fontsize = 24)
+        plt.xlabel('True class', fontsize=24)
+        plt.ylabel('Predicted class', fontsize = 24)
         plt.show()
     
     def plot_gridsearch(self,x, aspect = 3):

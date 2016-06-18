@@ -38,12 +38,12 @@ if __name__ == "__main__":
     rfcBO = BayesianOptimization(rfccv, {'n_estimators': (10, 250),
                                          'min_samples_split': (2, 25),
                                          'max_features': (0.1, 0.999)})
-    svcBO.maximize()
+    svcBO.maximize(acq='xcxcxc')
 
     print('-'*53)
-    rfcBO.maximize()
-
-    print('-'*53)
-    print('Final Results')
-    print('SVC: %f' % svcBO.res['max']['max_val'])
-    print('RFC: %f' % rfcBO.res['max']['max_val'])
+    #---------------------------------------------------------- rfcBO.maximize()
+#------------------------------------------------------------------------------ 
+    #------------------------------------------------------------- print('-'*53)
+    #---------------------------------------------------- print('Final Results')
+    #---------------------------- print('SVC: %f' % svcBO.res['max']['max_val'])
+    #---------------------------- print('RFC: %f' % rfcBO.res['max']['max_val'])
