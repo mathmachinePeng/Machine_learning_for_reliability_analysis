@@ -18,6 +18,25 @@ class standardprocess():
         new_rows= int(rows*ratio)
         new_dimens= dimens-1       
         return(rows, dimens, new_rows, new_dimens)
+
+    def sep_scale_divd(self, raw_data, ratio):
+        a, b, aa, bb = self.init_process(raw_data, ratio)
+        X_origin=np.array(raw_data)
+        
+
+
+        Train=X_origin[0:aa,0:bb]
+        Trainlabel=X_origin[0:aa,bb]
+        Test=X_origin[aa:a,0:bb]
+        Testlabel=X_origin[aa:a,bb]   
+        
+        min_max_scaler=preprocessing.MinMaxScaler()
+        
+        Train= min_max_scaler.fit_transform(Train)        
+        Test = min_max_scaler.transform(Test)  
+        return(Train, Trainlabel, Test, Testlabel)
+
+
         
     def scaledivd(self, raw_data, ratio):
         a, b, aa, bb = self.init_process(raw_data, ratio)
@@ -30,6 +49,9 @@ class standardprocess():
         Test=Xscale[aa:a,0:bb]
         Testlabel=Xscale[aa:a,bb]        
         return(Train, Trainlabel, Test, Testlabel)
+    
+    
+    
     
     def noscale(self, raw_data, ratio):
         a, b, aa, bb = self.init_process(raw_data, ratio)
