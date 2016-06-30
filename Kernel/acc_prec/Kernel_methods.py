@@ -1,5 +1,5 @@
 '''
-Created on 15 Jun 2016
+Created on 15 Feb 2016
 
 @author: peng
 '''
@@ -30,78 +30,45 @@ from sklearn.grid_search import GridSearchCV
 import re
 from astropy.io.fits.header import Header
 from matplotlib.pyplot import xlim
-from sklearn import svm
-
 
 
 start = timeit.default_timer()
-save_path = '/home/peng/git/Machine_learning_for_reliability_analysis/Kernel/Results/'
-result_name = 'rbf_auc_10CV_80_n10_p10_21.csv'
 
 ####### Read the source data######################
+df =pd.read_csv('Source_Data.csv', header=0)
 
-#---------------------------------- df =pd.read_csv('Source_Data.csv', header=0)
-#------------------------------------------------------------------------------ 
-#------------------------------------------------------------------------------ 
-#------------------------------------------- p= Preprocessdata.standardprocess()
-#------------------------------------------------------------------------------ 
-
-#------------------------------------------------------------------------------ 
-#--------------------- train, trainlabel, test, testlabel = p.scaledivd(df, 0.8)
-#--------------------------------------------------------- print np.shape(train)
-
-#################################### PCA  #############################
-#----------------------------------------- from sklearn.decomposition import PCA
-#------------------------------------------------------------------------------ 
-#--------------------------------------------------- for i in np.arange(1,13,1):
-#------------------------------------------------------------------------------ 
-    #------------------------------------------------- pca = PCA(n_components=i)
-    #----------------------------------------- newtrain=pca.fit_transform(train)
-    #--------------------------------------- print pca.explained_variance_ratio_
-    #------------------------------- print np.sum(pca.explained_variance_ratio_)
-    #-------------------------------------------------- print np.shape(newtrain)
-#------------------------------------------------------------------------------ 
-#------------------------------------------------------------------------------ 
-#-------------------------------------------------------------- train = newtrain
+p= Preprocessdata.standardprocess()
 
 
-################################# pca transfer training and test###############
-#------------------------------------------------------------------------------ 
-#---------------------------------------- pca_n = PCA(n_components=6).fit(train)
-#------------------------------------------------ train_2 = pca.transform(train)
-#------------------------------------------------------------------------------ 
-#------------------------------------------------------------------------------ 
-#------------------------------------------------------------------------------ 
-#----------------------------------------------------------------- print train_1
-#----------------------------------------------------------------- print train_2
+
+train, trainlabel, test, testlabel = p.scaledivd(df, 1.0)
+print np.shape(train)
+
+###################################### PCA  #############################
+from sklearn.decomposition import PCA
+
+pca = PCA(n_components=6)
+newtrain=pca.fit_transform(train)
+print pca.explained_variance_ratio_ 
+print np.sum(pca.explained_variance_ratio_)
+print np.shape(newtrain)
+
+
+train = newtrain
+
+
+
 ##########################################################################################################################
 
 ###############################################Train the model
 
-#--------------------------------------------------- ff = mysvc.training_manCV()
-#------------------------------------------------------------------------------ 
-# df = ff.trainauc(train, trainlabel, 'poly', Cmin=-10, Cmax=10, numC=21, rmin=-10, rmax=10, numr=21, degree = 2)
-#------------------------------------------------------------------------------ 
-#----------------------------- df.to_csv(save_path + result_name, header = True)
+ff = mysvc.training_manCV()
+
+df = ff.trainSVC(train, trainlabel, 'poly', Cmin=-10, Cmax=10, numC=21, rmin=-10, rmax=10, numr=21, degree = 4)
+
+df.to_csv('/home/peng/git/Machine_learning_for_reliability_analysis/Test_1/Results/poly_pca6_cm_10CV_d4_n10_p10_21.csv', header = True)
 
 
-
-################################################# Test the model
-
-scores_m = pd.read_csv(save_path + result_name, header = 0)
-
-print scores_m.max(axis = 0)
-
-#print scores_m.idxmax(axis=0)
-
-
-
-
-################################################# predict 
-#---------- bestmodel= svm.SVC(kernel='rbf', gamma=8, C=1).fit(train,trainlabel)
-#------------------------------------------------------------------------------ 
-#--------------------------------------------------------------- tt=mysvc.test()
-#-------------------- result = tt.test_classification(test, testlabel,bestmodel)
 
 ################################################ ####
 

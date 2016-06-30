@@ -281,7 +281,9 @@ class training(object):
     
     
     
-    def importance(self, forest, n):
+    def importance(self, forest, n, color, plot_std = False):
+        figsize(10,8)
+        
         print "************************this is the output of relative importance**************"
         #print(forest.feature_importances_)
         importances=forest.feature_importances_
@@ -292,13 +294,22 @@ class training(object):
         print("Feature ranking:")
         for f in range(12):
               print("%d. feature %d (%f)" % (f + 1, indices[f], importances[indices[f]]))
-        plt.figure(figsize=(8,6.5))
-        plt.bar(range(12), importances[indices],
-            color="c", align="center")
-         #------------------------------ plt.bar(range(12), importances[indices],
-             #--------------------- color="c", yerr=std[indices], align="center")
-        plt.xticks(range(n), indices+1, fontsize=14)
-        plt.yticks(fontsize = 14)
+        #plt.figure(figsize=(8,6.5))
+        
+        
+
+        
+        if plot_std == True:
+            pass                                 
+            #plt.bar(range(12), importances[indices],
+            #color=color, yerr=std[indices], align="center")
+        
+        else:
+            plt.bar(range(12), importances[indices],
+            color=color, align="center")
+        
+        plt.xticks(range(n), indices+1, fontsize=20)
+        plt.yticks(fontsize = 20)
         plt.xlim([-1, n])
 #        plt.ylim([0.00,0.30])
         plt.xlabel('The input feature', fontsize=24)
@@ -400,8 +411,9 @@ class test():
           
         outputtest= forest.predict(test) 
         accuracytrain = accuracy_score(testlabel, outputtest)
-        
-        return accuracytrain
+        return confusion_matrix(testlabel, outputtest)
+    
+        #return accuracytrain
     
     def testforest_R(self, test, testlabel, forest):
         outputtest= forest.predict(test) 
