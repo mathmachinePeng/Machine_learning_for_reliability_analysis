@@ -155,5 +155,7 @@ def create_bag_of_centroids(wordlist, word_centroid_map):
             bag_of_centroids[index] += 1
     return bag_of_centroids
           
+def remove_url(raw_review, column_type = unicode ):    
+    pass
     
 

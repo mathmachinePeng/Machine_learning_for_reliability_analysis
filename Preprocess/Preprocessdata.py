@@ -10,7 +10,7 @@ from sklearn.ensemble import RandomForestClassifier
 
 class standardprocess():
     def __init__(self):
-        print ("*************************************change*")
+        pass
     
     def init_process(self,raw_data, ratio):
         X=np.array(raw_data)

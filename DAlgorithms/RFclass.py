@@ -29,7 +29,7 @@ from sklearn.tree import DecisionTreeClassifier
 
 class training(object):
     def __init__(self):
-        print "This is for training set**************************************"
+        print "This is conducted in the off-line training phase: \n"
         
     def trainforest(self, seed, train, trainlabel, number_trees, number_features):
         seed_of_tree = {'rf': RandomForestClassifier(n_estimators= number_trees, max_features=number_features), 
@@ -290,10 +290,10 @@ class training(object):
         #return importances
         #std=np.std([tree.feature_importances_ for tree in forest.estimators_],axis=0)
         indices=np.argsort(importances)[::-1]
-        print indices
+        #print indices
         print("Feature ranking:")
         for f in range(12):
-              print("%d. feature %d (%f)" % (f + 1, indices[f], importances[indices[f]]))
+              print("%d. feature %d (%f)" % (f + 1, indices[f]+1, importances[indices[f]]))
         #plt.figure(figsize=(8,6.5))
         
         
