@@ -9,5 +9,4 @@
 # #import Preprocessdata1 as p
 # import MySVM as mysvc
 #===============================================================================
-
-from vis import visual
+from keras.layers.variational import VariationalDense as VAE

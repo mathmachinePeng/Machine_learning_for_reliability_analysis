@@ -315,6 +315,7 @@ class training(object):
         plt.xlabel('The input feature', fontsize=24)
         plt.ylabel('Relative importance', fontsize=24)
         plt.show()
+        return indices
     
     
     def dependence(self, forest, train, feature_set):

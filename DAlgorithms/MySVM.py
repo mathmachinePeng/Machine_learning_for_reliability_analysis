@@ -113,7 +113,7 @@ class training_manCV():
         #=======================================================================
     
 
-    def trainauc (self, train, trainlabel, seed, Cmin, Cmax, numC, rmin, rmax, numr, degree=3):
+    def trainauc (self, train, trainlabel, seed, Cmin, Cmax, numC, rmin, rmax, numr, degree=3, method = 'roc_auc', rad_stat =2):
         C_range=np.logspace(Cmin, Cmax, num=numC, base=2,endpoint= True)
         gamma_range=np.logspace(rmin, rmax, num=numr, base=2,endpoint= True)
         
@@ -131,7 +131,9 @@ class training_manCV():
                 svc.C = C
                 svc.gamma = gamma
                 svc.degree = degree
-                this_scores = cross_val_score(svc, train, trainlabel, scoring='roc_auc', cv=10, n_jobs=-1)
+                svc.random_state = rad_stat
+                this_scores = cross_val_score(svc, train, trainlabel, scoring=method, cv=10, n_jobs=-1 \
+                                              )
                 
                 score_C.append(np.mean(this_scores))                                      
 
