@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.colors import Normalize
 import pandas as pd
-from sklearn.svm import SVC
+from sklearn.svm import SVC, SVR
 from sklearn import preprocessing, cross_validation, metrics
 from sklearn.preprocessing import StandardScaler
 from sklearn.cross_validation import StratifiedShuffleSplit
@@ -12,12 +12,11 @@ from pandas.core.frame import DataFrame
 from sklearn import svm
 from sklearn.metrics.classification import accuracy_score, confusion_matrix, classification_report
 from matplotlib.ticker import MultipleLocator, FormatStrFormatter 
-from sklearn.svm import SVR
 from sklearn import metrics
 import re
 from sklearn.cross_validation import cross_val_score
 #from evolutionary_search import EvolutionaryAlgorithmSearchCV
-from sklearn.metrics import mean_absolute_error
+from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 
 
 
@@ -127,6 +126,40 @@ class training_manCV():
 #            score_C_this = []
             count=count+1
             for gamma in gamma_range:                   
+     
+                svc.C = C
+                svc.gamma = gamma
+                svc.degree = degree
+                svc.random_state = rad_stat
+                this_scores = cross_val_score(svc, train, trainlabel, scoring=method, cv=10, n_jobs=-1 \
+                                              )
+                
+                score_C.append(np.mean(this_scores))                                      
+
+               #score_C_this.append(np.mean(this_scores))
+            print (np.mean(score_C) )
+            print ("%r cycle finished, %r left" %(count, numC-count))
+            df_C_gamma[C]= score_C
+            #df_this[C] = score_C_this        
+        
+        return df_C_gamma 
+
+
+    def train_regress (self, train, trainlabel, seed, Cmin, Cmax, numC, rmin, rmax, numr, degree=3, method = 'rrmse', rad_stat =2):
+        C_range=np.logspace(Cmin, Cmax, num=numC, base=2,endpoint= True)
+        gamma_range=np.logspace(rmin, rmax, num=numr, base=2,endpoint= True)
+        
+        svc = SVR(kernel=seed)
+#        mean_score=[]
+        df_C_gamma= DataFrame({'gamma_range':gamma_range})
+#        df_this = DataFrame({'gamma_range':gamma_range})
+        count = 0 
+        for C in C_range:    
+            score_C=[]    
+#            score_C_this = []
+            count=count+1
+            for gamma in gamma_range: 
+                svc.epsilon = 0.00001                 
      
                 svc.C = C
                 svc.gamma = gamma
@@ -528,11 +561,19 @@ class test(object):
         return outputtest
         
     def test_regression(self, test, testlabel,bestmodel):
-        
+        three_scores = []
         outputtest = bestmodel.predict(test)
  #       print outputtest
         MAE = mean_absolute_error(testlabel, outputtest)
+        three_scores.append(MAE)
+        
+        MSE = mean_squared_error(testlabel, outputtest)
+        three_scores.append(MSE)
+        r2 = r2_score(testlabel, outputtest)
+        three_scores.append(r2)
 
-        print ("The MAE for the test set is %r" %MAE  )     
-        return outputtest
+        print ("The MAE for the test set is %r" %MAE  ) 
+        print ("The MSE for the test set is %r" %MSE  )   
+        print ("The R2 for the test set is %r" %r2 )       
+        return outputtest, three_scores
         
