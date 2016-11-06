@@ -15,6 +15,7 @@ def review_to_words( raw_review, filter_words = None ):
     # The input is a single string (a raw movie review), and 
     # the output is a single string (a preprocessed movie review)
     #
+    
     # 1. Remove HTML
     review_text = BeautifulSoup(raw_review).get_text() 
     #
@@ -35,13 +36,14 @@ def review_to_words( raw_review, filter_words = None ):
     # 
     # 5. Remove stop words
     meaningful_words = [w for w in words if not w in stops]   
+    
     #
     # 6. Join the words back into one string separated by space, 
     # and return the result.
     return( " ".join( meaningful_words ))   
 
 def review_to_wordlist( review, remove_stopwords=False ):
-    # Function to convert a document to a sequence of words,
+    # Function to convert a document to a sequence of words, stopwords are needed here
     # optionally removing stop words.  Returns a list of words.
     #
     # 1. Remove HTML
